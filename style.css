@@ -269,3 +269,147 @@ h3 {
 .net-legend-link:hover {
   border-bottom-color: var(--accent);
 }
+
+/* ---------- CONFERENCE FILTER ---------- */
+.conf-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.conf-dropdown {
+  position: relative;
+}
+
+.conf-button {
+  background: var(--bg-soft);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.55rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: border-color 0.15s ease;
+}
+
+.conf-button:hover { border-color: var(--accent); }
+
+.conf-caret { font-size: 0.7rem; color: var(--ink-soft); }
+
+.conf-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 280px;
+  max-height: 340px;
+  overflow-y: auto;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.4rem;
+  z-index: 20;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+.conf-dropdown.open .conf-menu { display: block; }
+
+.conf-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.conf-option:hover { background: rgba(255, 255, 255, 0.04); }
+
+.conf-option input {
+  accent-color: var(--accent);
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
+.conf-rank {
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  width: 1.6rem;
+  flex-shrink: 0;
+}
+
+.conf-name { flex: 1; }
+
+.conf-count {
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.1rem 0.45rem;
+  border-radius: 10px;
+}
+
+.conf-clear {
+  background: none;
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  border-radius: 8px;
+  padding: 0.55rem 0.8rem;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.conf-clear:hover { color: var(--ink); border-color: var(--ink-soft); }
+
+.conf-status {
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+
+.conf-footnote {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  margin: -0.5rem 0 1.5rem;
+}
+
+.conf-footnote a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s ease;
+}
+
+.conf-footnote a:hover { border-bottom-color: var(--accent); }
+
+.byline {
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  margin-top: 1.8rem;
+  letter-spacing: 0.01em;
+}
+
+.byline-label {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.72rem;
+  margin-right: 0.5rem;
+  opacity: 0.7;
+}
+
+.byline a {
+  color: var(--ink-soft);
+  text-decoration: none;
+  border-bottom: 1px solid var(--line);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.byline a:hover { color: var(--accent); border-bottom-color: var(--accent); }
