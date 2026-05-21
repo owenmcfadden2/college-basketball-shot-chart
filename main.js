@@ -49,6 +49,7 @@ const CONFERENCES = [
 // module-level state
 let allData = [];
 const selectedConferences = new Set(); // empty = show all
+let selectedTeamId = null; // currently clicked team
  
 // shared scales/elements built once
 let x, y, color, svg, tooltip;
@@ -191,10 +192,29 @@ function updateDots() {
         .style("left", event.clientX + 14 + "px")
         .style("top", event.clientY + 14 + "px");
     })
-    .on("mouseout", function () {
-      d3.select(this).attr("r", 5);
+    .on("mouseout", function (event, d) {
+      d3.select(this).attr("r", d.teamId === selectedTeamId ? 7 : 5);
       tooltip.style("opacity", 0);
+    })
+    .on("click", function (event, d) {
+      selectedTeamId = d.teamId;
+      // reset all dots, then emphasize the clicked one
+      svg
+        .selectAll(".dot")
+        .classed("selected", false)
+        .attr("r", 5);
+      d3.select(this).classed("selected", true).attr("r", 7);
+      showTeamPanel(d);
     });
+ 
+  // keep the selected dot emphasized across re-renders (e.g. filtering)
+  if (selectedTeamId != null) {
+    svg
+      .selectAll(".dot")
+      .filter((d) => d.teamId === selectedTeamId)
+      .classed("selected", true)
+      .attr("r", 7);
+  }
  
   updateFilterStatus(filtered.length);
 }
@@ -266,4 +286,197 @@ function updateFilterStatus(count) {
     ).map((c) => c.name);
     status.textContent = `Showing ${count} teams from: ${names.join(", ")}`;
   }
+}
+ 
+/* ---------- conference id -> name lookup ---------- */
+const CONF_NAME = Object.fromEntries(
+  CONFERENCES.map((c) => [c.id, c.name])
+);
+ 
+// conference id -> BartTorvik rank (array order, 1-indexed)
+const CONF_RANK = Object.fromEntries(
+  CONFERENCES.map((c, i) => [c.id, i + 1])
+);
+ 
+/* ---------- shot zones for the detail panel ---------- */
+// each zone: label, the FGA% (rate) column, FG% (efficiency) column,
+// and their matching percentile columns
+const ZONES = [
+  {
+    label: "At Rim",
+    rate: "ATR2 FGA%",
+    ratePct: "ATR2 FGA% %ile",
+    eff: "ATR2 FG%",
+    effPct: "ATR2 FG% %ile",
+  },
+  {
+    label: "Paint (non-rim)",
+    rate: "PAINT2 FGA%",
+    ratePct: "PAINT2 FGA% %ile",
+    eff: "PAINT2 FG%",
+    effPct: "PAINT2 FG% %ile",
+  },
+  {
+    label: "Midrange",
+    rate: "MID2 FGA%",
+    ratePct: "MID2 FGA% %ile",
+    eff: "MID2 FG%",
+    effPct: "MID2 FG% %ile",
+  },
+  {
+    label: "Above-the-Break 3",
+    rate: "ATB3 FGA%",
+    ratePct: "ATB3 FGA% %ile",
+    eff: "ATB3 FG%",
+    effPct: "ATB3 FG% %ile",
+  },
+  {
+    label: "Corner 3",
+    rate: "C3 FGA%",
+    ratePct: "C3 FGA% %ile",
+    eff: "C3 FG%",
+    effPct: "C3 FG% %ile",
+  },
+];
+ 
+/* ---------- render the detail panel for a clicked team ---------- */
+// bar width scale for shot-diet rates: 0 to 50% maps to 0..110px
+const dietBarScale = d3.scaleLinear().domain([0, 0.5]).range([0, 110]).clamp(true);
+ 
+function showTeamPanel(d) {
+  const panel = d3.select("#team-panel");
+  panel.classed("active", true);
+  panel.html(""); // clear previous
+ 
+  // ----- header: name, conference, close button -----
+  const header = panel.append("div").attr("class", "tp-header");
+ 
+  const titleWrap = header.append("div");
+  titleWrap.append("h3").attr("class", "tp-name").text(d.teamMarket);
+ 
+  const confName = CONF_NAME[d.conferenceId] || "Unknown";
+  const confRank = CONF_RANK[d.conferenceId];
+  const overallLosses = d["GP*"] - d.Wins;
+ 
+  titleWrap
+    .append("p")
+    .attr("class", "tp-sub")
+    .text(
+      `${confName} (#${confRank} conf) \u00b7 NET #${d[NET_COL]} \u00b7 ` +
+        `${d.Wins}-${overallLosses} \u00b7 ${d.confWins} conf wins`
+    );
+ 
+  header
+    .append("button")
+    .attr("class", "tp-close")
+    .attr("type", "button")
+    .html("&times;")
+    .on("click", closeTeamPanel);
+ 
+  // ----- headline tradeoff: quality + volume with percentiles -----
+  const headline = panel.append("div").attr("class", "tp-headline");
+ 
+  addHeadlineStat(
+    headline,
+    "Shot Quality",
+    `${(d[Y_COL] * 100).toFixed(1)}% eFG`,
+    d["Rim + 3s eFG% %ile"],
+    "on Rim + 3s shots"
+  );
+  addHeadlineStat(
+    headline,
+    "Shot Volume",
+    `${d[X_COL].toFixed(1)} / game`,
+    d["Rim + 3s FGA/G %ile"],
+    "Rim + 3s attempts"
+  );
+ 
+  // ----- shot diet + efficiency table by zone -----
+  panel
+    .append("h4")
+    .attr("class", "tp-section-title")
+    .text("Shot diet & efficiency by zone");
+ 
+  const table = panel.append("div").attr("class", "tp-zones");
+ 
+  // header row
+  const head = table.append("div").attr("class", "tp-zone-row tp-zone-head");
+  head.append("span").text("Zone");
+  head.append("span").text("Share of FGA");
+  head.append("span").text("FG%");
+ 
+  ZONES.forEach((z) => {
+    const row = table.append("div").attr("class", "tp-zone-row");
+    row.append("span").attr("class", "tp-zone-label").text(z.label);
+ 
+    // rate cell: bar + value
+    const rateCell = row.append("span").attr("class", "tp-zone-cell");
+    rateCell
+      .append("span")
+      .attr("class", "tp-bar")
+      .style("width", `${dietBarScale(d[z.rate])}px`);
+    rateCell
+      .append("span")
+      .attr("class", "tp-val")
+      .text(`${(d[z.rate] * 100).toFixed(1)}%`);
+ 
+    // efficiency cell: value + percentile chip
+    const effCell = row.append("span").attr("class", "tp-zone-cell");
+    effCell
+      .append("span")
+      .attr("class", "tp-val")
+      .text(`${(d[z.eff] * 100).toFixed(1)}%`);
+    effCell
+      .append("span")
+      .attr("class", "tp-pct-chip")
+      .style("background", pctColor(d[z.effPct]))
+      .text(`${pctLabel(d[z.effPct])}`);
+  });
+ 
+  // scroll panel into view if it's off-screen
+  document.getElementById("team-panel").scrollIntoView({
+    behavior: "smooth",
+    block: "nearest",
+  });
+}
+ 
+/* ---------- close the detail panel and reset selection ---------- */
+function closeTeamPanel() {
+  const panel = d3.select("#team-panel");
+  panel.classed("active", false);
+  panel.html(
+    '<p class="team-panel-hint">Click any team\'s dot to see its full shot profile.</p>'
+  );
+  selectedTeamId = null;
+  svg.selectAll(".dot").classed("selected", false).attr("r", 5);
+}
+ 
+/* helper: one big headline stat block with a percentile bar */
+function addHeadlineStat(parent, label, value, pctile, note) {
+  const block = parent.append("div").attr("class", "tp-stat");
+  block.append("div").attr("class", "tp-stat-label").text(label);
+  block.append("div").attr("class", "tp-stat-value").text(value);
+  block.append("div").attr("class", "tp-stat-note").text(note);
+ 
+  const bar = block.append("div").attr("class", "tp-stat-bar");
+  bar
+    .append("div")
+    .attr("class", "tp-stat-bar-fill")
+    .style("width", `${pctile * 100}%`)
+    .style("background", pctColor(pctile));
+  block
+    .append("div")
+    .attr("class", "tp-stat-pct")
+    .text(`${pctLabel(pctile)} percentile`);
+}
+ 
+/* helper: format a 0-1 percentile as an ordinal-ish label */
+function pctLabel(p) {
+  return `${Math.round(p * 100)}th`;
+}
+ 
+/* helper: color a percentile green->red using the same scheme as the chart */
+function pctColor(p) {
+  // p is 0..1 where 1 is best; interpolateRdYlGn: 0=red, 1=green
+  return d3.interpolateRdYlGn(p);
 }
