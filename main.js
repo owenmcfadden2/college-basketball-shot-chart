@@ -46,6 +46,10 @@ const CONFERENCES = [
   { id: 5, name: "MEAC" },
 ];
  
+// conferences with a built-out profile page (top 5 to start).
+// add ids here as more pages come online. keep in sync with conference.js
+const ENABLED_CONFERENCES = new Set([73, 89, 60, 53, 29]);
+ 
 // module-level state
 let allData = [];
 const selectedConferences = new Set(); // empty = show all
@@ -53,6 +57,7 @@ let selectedTeamId = null; // currently clicked team
  
 // shared scales/elements built once
 let x, y, color, svg, tooltip;
+let chartWidth, chartHeight;
  
 d3.csv("data/shot_data.csv", d3.autoType).then((raw) => {
   allData = raw.filter(
@@ -69,6 +74,8 @@ function buildChartShell() {
   const container = document.getElementById("chart");
   const width = container.clientWidth - MARGIN.left - MARGIN.right;
   const height = 520 - MARGIN.top - MARGIN.bottom;
+  chartWidth = width;
+  chartHeight = height;
  
   // scales fixed to full dataset so points don't move when filtering
   x = d3
@@ -148,6 +155,46 @@ function buildChartShell() {
     .attr("y2", y(yMed));
  
   tooltip = d3.select("#tooltip");
+ 
+  // ----- brush layer (sits below the dots so dots stay clickable) -----
+  const brush = d3
+    .brush()
+    .extent([
+      [0, 0],
+      [chartWidth, chartHeight],
+    ])
+    .on("end", brushed);
+ 
+  svg.append("g").attr("class", "brush").call(brush);
+}
+ 
+/* ---------- handle a completed brush selection ---------- */
+function brushed(event) {
+  // no selection (cleared brush) -> reset to hint
+  if (!event.selection) {
+    return;
+  }
+ 
+  const [[x0, y0], [x1, y1]] = event.selection;
+ 
+  // current visible set respects the conference filter
+  const visible =
+    selectedConferences.size === 0
+      ? allData
+      : allData.filter((d) => selectedConferences.has(d.conferenceId));
+ 
+  // teams whose dots fall inside the brushed rectangle
+  const inside = visible.filter((d) => {
+    const cx = x(d[X_COL]);
+    const cy = y(d[Y_COL]);
+    return cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1;
+  });
+ 
+  if (inside.length === 0) {
+    showEmptyBrush();
+  } else {
+    showGroupPanel(inside);
+  }
 }
  
 /* ---------- redraw just the dots based on current filter ---------- */
@@ -279,12 +326,18 @@ function buildConferenceDropdown() {
 function updateFilterStatus(count) {
   const status = document.getElementById("conf-status");
   if (selectedConferences.size === 0) {
-    status.textContent = `Showing all ${count} teams`;
+    status.innerHTML = `Showing all ${count} teams`;
   } else {
-    const names = CONFERENCES.filter((c) =>
+    const selected = CONFERENCES.filter((c) =>
       selectedConferences.has(c.id)
-    ).map((c) => c.name);
-    status.textContent = `Showing ${count} teams from: ${names.join(", ")}`;
+    );
+    const parts = selected.map((c) => {
+      if (ENABLED_CONFERENCES.has(c.id)) {
+        return `<a class="conf-link" href="conference.html?conf=${c.id}">${c.name}</a>`;
+      }
+      return c.name;
+    });
+    status.innerHTML = `Showing ${count} teams from: ${parts.join(", ")}`;
   }
 }
  
@@ -449,6 +502,120 @@ function closeTeamPanel() {
   );
   selectedTeamId = null;
   svg.selectAll(".dot").classed("selected", false).attr("r", 5);
+}
+ 
+/* ---------- empty brush message ---------- */
+function showEmptyBrush() {
+  const panel = d3.select("#team-panel");
+  panel.html(
+    '<p class="team-panel-hint">No teams in that selection. Try a wider brush.</p>'
+  );
+}
+ 
+/* ---------- average a list of teams over a column ---------- */
+function avg(teams, col) {
+  return d3.mean(teams, (d) => d[col]);
+}
+ 
+/* ---------- render the averaged panel for a brushed group ---------- */
+function showGroupPanel(teams) {
+  // clicking a team takes priority visually, so clear any single selection
+  selectedTeamId = null;
+  svg.selectAll(".dot").classed("selected", false).attr("r", 5);
+ 
+  const panel = d3.select("#team-panel");
+  panel.classed("active", true);
+  panel.html("");
+ 
+  // ----- header: count + clear button -----
+  const header = panel.append("div").attr("class", "tp-header");
+ 
+  const titleWrap = header.append("div");
+  titleWrap
+    .append("h3")
+    .attr("class", "tp-name")
+    .text(`${teams.length} teams selected`);
+  titleWrap
+    .append("p")
+    .attr("class", "tp-sub")
+    .text("Group averages across the brushed region");
+ 
+  header
+    .append("button")
+    .attr("class", "tp-close")
+    .attr("type", "button")
+    .html("&times;")
+    .on("click", () => {
+      // clear the brush rectangle and reset
+      svg.select(".brush").call(d3.brush().move, null);
+      closeTeamPanel();
+    });
+ 
+  // ----- headline: averaged quality + volume w/ avg percentile -----
+  const headline = panel.append("div").attr("class", "tp-headline");
+ 
+  addHeadlineStat(
+    headline,
+    "Avg Shot Quality",
+    `${(avg(teams, Y_COL) * 100).toFixed(1)}% eFG`,
+    avg(teams, "Rim + 3s eFG% %ile"),
+    "on Rim + 3s shots"
+  );
+  addHeadlineStat(
+    headline,
+    "Avg Shot Volume",
+    `${avg(teams, X_COL).toFixed(1)} / game`,
+    avg(teams, "Rim + 3s FGA/G %ile"),
+    "Rim + 3s attempts"
+  );
+ 
+  // ----- averaged zone diet & efficiency -----
+  panel
+    .append("h4")
+    .attr("class", "tp-section-title")
+    .text("Average shot diet & efficiency by zone");
+ 
+  const table = panel.append("div").attr("class", "tp-zones");
+ 
+  const head = table.append("div").attr("class", "tp-zone-row tp-zone-head");
+  head.append("span").text("Zone");
+  head.append("span").text("Avg share of FGA");
+  head.append("span").text("Avg FG%");
+ 
+  ZONES.forEach((z) => {
+    const avgRate = avg(teams, z.rate);
+    const avgEff = avg(teams, z.eff);
+    const avgEffPct = avg(teams, z.effPct);
+ 
+    const row = table.append("div").attr("class", "tp-zone-row");
+    row.append("span").attr("class", "tp-zone-label").text(z.label);
+ 
+    const rateCell = row.append("span").attr("class", "tp-zone-cell");
+    rateCell
+      .append("span")
+      .attr("class", "tp-bar")
+      .style("width", `${dietBarScale(avgRate)}px`);
+    rateCell
+      .append("span")
+      .attr("class", "tp-val")
+      .text(`${(avgRate * 100).toFixed(1)}%`);
+ 
+    const effCell = row.append("span").attr("class", "tp-zone-cell");
+    effCell
+      .append("span")
+      .attr("class", "tp-val")
+      .text(`${(avgEff * 100).toFixed(1)}%`);
+    effCell
+      .append("span")
+      .attr("class", "tp-pct-chip")
+      .style("background", pctColor(avgEffPct))
+      .text(pctLabel(avgEffPct));
+  });
+ 
+  document.getElementById("team-panel").scrollIntoView({
+    behavior: "smooth",
+    block: "nearest",
+  });
 }
  
 /* helper: one big headline stat block with a percentile bar */

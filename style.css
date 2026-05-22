@@ -747,3 +747,76 @@ h3 {
   border-radius: 10px;
   font-variant-numeric: tabular-nums;
 }
+
+/* ---------- BRUSH ---------- */
+.brush .selection {
+  fill: var(--accent);
+  fill-opacity: 0.12;
+  stroke: var(--accent);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.brush .handle { fill: var(--accent); fill-opacity: 0.4; }
+
+/* let dot hovers/clicks pass through the brush overlay */
+.brush .overlay { cursor: crosshair; }
+
+/* ---------- CONFERENCE LINK (homepage status) ---------- */
+.conf-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s ease;
+}
+
+.conf-link:hover { border-bottom-color: var(--accent); }
+
+/* ---------- CONFERENCE PROFILE PAGE ---------- */
+.conf-nav {
+  padding: 1.5rem 8vw;
+  border-bottom: 1px solid var(--line);
+}
+
+.conf-nav-back {
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.15s ease;
+}
+
+.conf-nav-back:hover { color: var(--accent); }
+
+.conf-hero {
+  padding: 4rem 8vw 3rem;
+  background:
+    radial-gradient(900px 500px at 85% -20%, rgba(255,122,47,0.16), transparent 60%),
+    var(--bg);
+}
+
+.conf-hero h1 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(2.5rem, 8vw, 5.5rem);
+  line-height: 1;
+  margin: 0.3rem 0 0;
+  letter-spacing: -0.02em;
+}
+
+.conf-section {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.conf-placeholder {
+  background: var(--bg-soft);
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  padding: 2.5rem;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
