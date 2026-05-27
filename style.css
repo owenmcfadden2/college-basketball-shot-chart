@@ -854,8 +854,7 @@ h3 {
 }
 .conf-meta-btn:hover { color: var(--ink); border-color: var(--ink-soft); }
 
-.team-search-wrap { margin-top: 0.6rem; }
-.team-search-wrap input {
+#team-search {
   background: var(--bg-soft);
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -867,8 +866,8 @@ h3 {
   outline: none;
   transition: border-color 0.15s ease;
 }
-.team-search-wrap input::placeholder { color: var(--ink-soft); }
-.team-search-wrap input:focus { border-color: var(--accent); }
+#team-search::placeholder { color: var(--ink-soft); }
+#team-search:focus { border-color: var(--accent); }
 
 .team-annotation {
   fill: var(--ink-soft);
