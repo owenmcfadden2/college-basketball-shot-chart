@@ -123,7 +123,7 @@ function buildChartShell() {
     .attr("x", width / 2)
     .attr("y", height + 45)
     .attr("text-anchor", "middle")
-    .text("Rim + 3s Attempts Per Game  (Volume \u2192)");
+    .text("How many rim-and-3-point shots a team takes each game");
  
   svg
     .append("text")
@@ -132,7 +132,7 @@ function buildChartShell() {
     .attr("x", -height / 2)
     .attr("y", -50)
     .attr("text-anchor", "middle")
-    .text("Rim + 3s eFG%  (Quality \u2192)");
+    .text("How efficiently those shots turn into points (higher = better)");
  
   // median lines (based on full dataset)
   const xMed = d3.median(allData, (d) => d[X_COL]);
