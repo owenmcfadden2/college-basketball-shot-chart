@@ -172,9 +172,10 @@ h3 {
 .median-line { stroke: var(--ink-soft); stroke-dasharray: 4 4; opacity: 0.4; }
 .quadrant-label { fill: var(--ink-soft); font-size: 11px; opacity: 0.7; }
 
-.dot { cursor: pointer; transition: r 0.12s ease, opacity 0.12s ease; }
+.dot { cursor: pointer; transition: r 0.12s ease, opacity 0.12s ease, filter 0.2s ease; }
 .dot:hover { stroke: var(--ink); stroke-width: 1.5px; }
 .dot.dim { opacity: 0.12; }
+.dot.dimmed { opacity: 0.15; filter: blur(1.5px); }
 
 /* ---------- VIZ HEADER (two-column) ---------- */
 .viz-header {

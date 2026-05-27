@@ -177,8 +177,13 @@ function updateDots() {
       (exit) => exit.transition().duration(150).attr("r", 0).remove()
     )
     .attr("opacity", (d) => {
-      if (searchTerm.length < 2) return 1;
-      return d.teamMarket.toLowerCase().includes(searchTerm.toLowerCase()) ? 1 : 0.1;
+      if (searchTerm.length >= 2)
+        return d.teamMarket.toLowerCase().includes(searchTerm.toLowerCase()) ? 1 : 0.1;
+      return 1;
+    })
+    .classed("dimmed", (d) => {
+      if (searchTerm.length >= 2) return false;
+      return annotationLimit > 0 && d[NET_COL] > annotationLimit;
     })
     .on("mouseover", function (event, d) {
       d3.select(this).attr("r", 8);
