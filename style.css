@@ -854,6 +854,31 @@ h3 {
 }
 .conf-meta-btn:hover { color: var(--ink); border-color: var(--ink-soft); }
 
+.annot-label {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.annot-input {
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  padding: 0.5rem 0.6rem;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  width: 56px;
+  outline: none;
+  text-align: center;
+  transition: border-color 0.15s ease;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.annot-input::-webkit-inner-spin-button,
+.annot-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.annot-input:focus { border-color: var(--accent); }
+
 #team-search {
   background: var(--bg-soft);
   border: 1px solid var(--line);

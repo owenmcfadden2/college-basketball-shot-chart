@@ -50,6 +50,7 @@ let allData = [];
 const selectedConferences = new Set();
 let selectedTeamId = null;
 let searchTerm = "";
+let annotationLimit = 0;
  
 let x, y, color, svg, tooltip;
 let chartWidth, chartHeight;
@@ -71,8 +72,9 @@ function buildChartShell() {
   chartWidth = width;
   chartHeight = height;
  
+  const [xMin, xMax] = d3.extent(allData, (d) => d[X_COL]);
   x = d3.scaleLinear()
-    .domain(d3.extent(allData, (d) => d[X_COL])).nice().range([0, width]);
+    .domain([xMin, xMax + (xMax - xMin) * 0.08]).nice().range([0, width]);
   y = d3.scaleLinear()
     .domain(d3.extent(allData, (d) => d[Y_COL])).nice().range([height, 0]);
   color = d3.scaleSequential(d3.interpolateRdYlGn)
@@ -217,7 +219,7 @@ function updateAnnotations(visible) {
 
   const labelTeams = st.length >= 2
     ? visible.filter((d) => d.teamMarket.toLowerCase().includes(st))
-    : visible.filter((d) => d[NET_COL] <= 15).sort((a, b) => a[NET_COL] - b[NET_COL]);
+    : visible.filter((d) => d[NET_COL] <= annotationLimit).sort((a, b) => a[NET_COL] - b[NET_COL]);
 
   labelTeams.forEach((d) => {
     layer.append("text")
@@ -231,9 +233,8 @@ function updateAnnotations(visible) {
 function buildMetaButtons() {
   const menu = d3.select("#conf-menu");
 
-  document.getElementById("conf-all").addEventListener("click", () => {
-    CONFERENCES.forEach((c) => selectedConferences.add(c.id));
-    menu.selectAll("input").property("checked", true);
+  document.getElementById("annot-limit").addEventListener("input", function () {
+    annotationLimit = Math.max(0, parseInt(this.value) || 0);
     updateDots();
   });
 
