@@ -165,7 +165,7 @@ function updateDots() {
     : allData.filter((d) => selectedConferences.has(d.conferenceId));
  
   svg.selectAll(".dot")
-    .data(filtered, (d) => d.teamId)
+    .data(allData, (d) => d.teamId)
     .join(
       (enter) =>
         enter.append("circle").attr("class", "dot")
@@ -183,7 +183,9 @@ function updateDots() {
     })
     .classed("dimmed", (d) => {
       if (searchTerm.length >= 2) return false;
-      return annotationLimit > 0 && d[NET_COL] > annotationLimit;
+      const confDim = selectedConferences.size > 0 && !selectedConferences.has(d.conferenceId);
+      const annotDim = annotationLimit > 0 && d[NET_COL] > annotationLimit;
+      return confDim || annotDim;
     })
     .on("mouseover", function (event, d) {
       d3.select(this).attr("r", 8);
