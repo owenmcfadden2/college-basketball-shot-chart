@@ -175,7 +175,7 @@ h3 {
 .dot { cursor: pointer; transition: r 0.12s ease, opacity 0.12s ease, filter 0.2s ease; }
 .dot:hover { stroke: var(--ink); stroke-width: 1.5px; }
 .dot.dim { opacity: 0.12; }
-.dot.dimmed { opacity: 0.15; filter: blur(1.5px); }
+.dot.dimmed { opacity: 0.15; filter: blur(1.5px); pointer-events: none; }
 
 /* ---------- VIZ HEADER (two-column) ---------- */
 .viz-header {

@@ -245,13 +245,7 @@ function buildMetaButtons() {
     updateDots();
   });
 
-  document.getElementById("conf-none").addEventListener("click", () => {
-    selectedConferences.clear();
-    menu.selectAll("input").property("checked", false);
-    updateDots();
-  });
-
-  document.getElementById("conf-major").addEventListener("click", () => {
+document.getElementById("conf-major").addEventListener("click", () => {
     selectedConferences.clear();
     CONFERENCES.forEach((c) => { if (POWER_5.has(c.id)) selectedConferences.add(c.id); });
     menu.selectAll("input").each(function () {
