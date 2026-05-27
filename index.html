@@ -45,7 +45,7 @@
         <div class="viz-header-text">
           <h2>Shot Quality vs. Shot Volume</h2>
           <p class="viz-caption">
-            Each dot is a team. Hover to see who. The dashed lines mark the median in each direction.
+            Each dot is a team. Move right for more rim-and-3-point attempts per game, and move up for better efficiency on those shots. Hover to see who each dot is.
           </p>
         </div>
 
@@ -81,6 +81,13 @@
       </p>
 
       <div id="chart"></div>
+
+      <div class="axis-explainer" aria-label="How to read the chart axes">
+        <h3>How to read this chart</h3>
+        <p><strong>Left to right:</strong> teams with more rim-and-3-point attempts per game appear farther right.</p>
+        <p><strong>Bottom to top:</strong> teams that turn those shots into points more efficiently appear higher up.</p>
+        <p><strong>Why it matters:</strong> a team can be aggressive, efficient, or both — this chart helps you spot which style it uses.</p>
+      </div>
 
       <div id="tooltip" class="tooltip" role="status"></div>
 

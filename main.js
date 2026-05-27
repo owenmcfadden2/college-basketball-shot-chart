@@ -90,12 +90,22 @@ function buildChartShell() {
   svg.append("g").attr("class", "axis")
     .call(d3.axisLeft(y).ticks(8).tickFormat(d3.format(".0%")));
  
-  svg.append("text").attr("class", "axis-label")
-    .attr("x", width / 2).attr("y", height + 45).attr("text-anchor", "middle")
-    .text("Rim + 3s Attempts Per Game  (Volume →)");
-  svg.append("text").attr("class", "axis-label")
-    .attr("transform", "rotate(-90)").attr("x", -height / 2).attr("y", -50)
-    .attr("text-anchor", "middle").text("Rim + 3s eFG%  (Quality →)");
+  svg
+    .append("text")
+    .attr("class", "axis-label")
+    .attr("x", width / 2)
+    .attr("y", height + 45)
+    .attr("text-anchor", "middle")
+    .text("Rim + 3s Attempts Per Game  (Volume \u2192)");
+ 
+  svg
+    .append("text")
+    .attr("class", "axis-label")
+    .attr("transform", "rotate(-90)")
+    .attr("x", -height / 2)
+    .attr("y", -50)
+    .attr("text-anchor", "middle")
+    .text("Rim + 3s eFG%  (Quality \u2192)");
  
   const xMed = d3.median(allData, (d) => d[X_COL]);
   const yMed = d3.median(allData, (d) => d[Y_COL]);
