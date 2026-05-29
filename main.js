@@ -3,7 +3,7 @@
    Core scatterplot + conference filter
    ============================================================ */
  
-const MARGIN = { top: 30, right: 30, bottom: 60, left: 70 };
+const MARGIN = { top: 36, right: 40, bottom: 70, left: 82 };
  
 const X_COL = "Rim + 3s FGA/G";
 const Y_COL = "Rim + 3s eFG%";
@@ -54,6 +54,12 @@ let annotationLimit = 0;
  
 let x, y, color, svg, tooltip;
 let chartWidth, chartHeight;
+
+function winBinLabel(wins) {
+  const start = Math.floor(wins / 5) * 5;
+  const end = start + 4;
+  return `${start}-${end} wins`;
+}
  
 d3.csv("data/shot_data.csv", d3.autoType).then((raw) => {
   allData = raw.filter(
@@ -68,7 +74,7 @@ d3.csv("data/shot_data.csv", d3.autoType).then((raw) => {
 function buildChartShell() {
   const container = document.getElementById("chart");
   const width = container.clientWidth - MARGIN.left - MARGIN.right;
-  const height = 520 - MARGIN.top - MARGIN.bottom;
+  const height = 580 - MARGIN.top - MARGIN.bottom;
   chartWidth = width;
   chartHeight = height;
  
@@ -88,9 +94,9 @@ function buildChartShell() {
     .attr("transform", `translate(${MARGIN.left},${MARGIN.top})`);
  
   svg.append("g").attr("class", "axis")
-    .attr("transform", `translate(0,${height})`).call(d3.axisBottom(x).ticks(8));
+    .attr("transform", `translate(0,${height})`).call(d3.axisBottom(x).ticks(9));
   svg.append("g").attr("class", "axis")
-    .call(d3.axisLeft(y).ticks(8).tickFormat(d3.format(".0%")));
+    .call(d3.axisLeft(y).ticks(9).tickFormat(d3.format(".0%")));
  
   svg
     .append("text")
@@ -172,7 +178,7 @@ function updateDots() {
           .attr("cx", (d) => x(d[X_COL])).attr("cy", (d) => y(d[Y_COL]))
           .attr("fill", (d) => color(d[NET_COL]))
           .attr("stroke", "rgba(0,0,0,0.3)").attr("stroke-width", 0.5)
-          .attr("r", 0).call((e) => e.transition().duration(250).attr("r", 5)),
+          .attr("r", 0).call((e) => e.transition().duration(250).attr("r", 5.5)),
       (update) => update,
       (exit) => exit.transition().duration(150).attr("r", 0).remove()
     )
@@ -188,10 +194,10 @@ function updateDots() {
       return confDim || annotDim;
     })
     .on("mouseover", function (event, d) {
-      d3.select(this).attr("r", 8);
+      d3.select(this).attr("r", 8.5);
       tooltip.style("opacity", 1).html(
         `<div class="t-name">${d.teamMarket}</div>` +
-        `<div class="t-row">NET #${d[NET_COL]} &middot; ${d.Wins} wins</div>` +
+        `<div class="t-row">NET #${d[NET_COL]} &middot; ${winBinLabel(d.Wins)}</div>` +
         `<div class="t-row">${d[X_COL].toFixed(1)} att/g &middot; ${(d[Y_COL] * 100).toFixed(1)}% eFG</div>`
       );
     })
@@ -199,20 +205,20 @@ function updateDots() {
       tooltip.style("left", event.clientX + 14 + "px").style("top", event.clientY + 14 + "px");
     })
     .on("mouseout", function (event, d) {
-      d3.select(this).attr("r", d.teamId === selectedTeamId ? 7 : 5);
+      d3.select(this).attr("r", d.teamId === selectedTeamId ? 7.5 : 5.5);
       tooltip.style("opacity", 0);
     })
     .on("click", function (event, d) {
       selectedTeamId = d.teamId;
-      svg.selectAll(".dot").classed("selected", false).attr("r", 5);
-      d3.select(this).classed("selected", true).attr("r", 7);
+      svg.selectAll(".dot").classed("selected", false).attr("r", 5.5);
+      d3.select(this).classed("selected", true).attr("r", 7.5);
       showTeamPanel(d);
     });
  
   if (selectedTeamId != null) {
     svg.selectAll(".dot")
       .filter((d) => d.teamId === selectedTeamId)
-      .classed("selected", true).attr("r", 7);
+      .classed("selected", true).attr("r", 7.5);
   }
  
   updateFilterStatus(filtered.length);
@@ -245,7 +251,7 @@ function buildMetaButtons() {
     updateDots();
   });
 
-document.getElementById("conf-major").addEventListener("click", () => {
+  document.getElementById("conf-major").addEventListener("click", () => {
     selectedConferences.clear();
     CONFERENCES.forEach((c) => { if (POWER_5.has(c.id)) selectedConferences.add(c.id); });
     menu.selectAll("input").each(function () {
@@ -332,7 +338,7 @@ function showTeamPanel(d) {
   const overallLosses = d["GP*"] - d.Wins;
  
   titleWrap.append("p").attr("class", "tp-sub")
-    .text(`${confName} (#${confRank} conf) · NET #${d[NET_COL]} · ${d.Wins}-${overallLosses} · ${d.confWins} conf wins`);
+    .text(`${confName} (#${confRank} conf) · NET #${d[NET_COL]} · ${winBinLabel(d.Wins)} · record ${d.Wins}-${overallLosses} · ${d.confWins} conf wins`);
   header.append("button").attr("class", "tp-close").attr("type", "button")
     .html("&times;").on("click", closeTeamPanel);
  
@@ -367,7 +373,7 @@ function closeTeamPanel() {
   panel.classed("active", false);
   panel.html('<p class="team-panel-hint">Click any team\'s dot to see its full shot profile.</p>');
   selectedTeamId = null;
-  svg.selectAll(".dot").classed("selected", false).attr("r", 5);
+  svg.selectAll(".dot").classed("selected", false).attr("r", 5.5);
 }
  
 function showEmptyBrush() {
@@ -379,7 +385,7 @@ function avg(teams, col) { return d3.mean(teams, (d) => d[col]); }
  
 function showGroupPanel(teams) {
   selectedTeamId = null;
-  svg.selectAll(".dot").classed("selected", false).attr("r", 5);
+  svg.selectAll(".dot").classed("selected", false).attr("r", 5.5);
  
   const panel = d3.select("#team-panel");
   panel.classed("active", true);

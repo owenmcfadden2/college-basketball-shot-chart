@@ -48,15 +48,36 @@
 
         <div class="net-legend">
           <div class="net-legend-head">
-            <span class="net-legend-title">NET Ranking</span>
-            <span class="net-legend-note">The NCAA's official metric for ranking teams. A lower number means a stronger team.</span>
+            <span class="net-legend-title">Dot Color Legend</span>
+            <span class="net-legend-note">Dots are colored by NET Ranking. Green means stronger, red means weaker.</span>
             <a class="net-legend-link" href="https://www.ncaa.com/news/basketball-men/article/2022-12-05/college-basketballs-net-rankings-explained" target="_blank" rel="noopener noreferrer">For more information on NET rankings &rarr;</a>
           </div>
-          <div class="net-legend-bar"></div>
-          <div class="net-legend-labels">
-            <span>#1 &middot; Best</span>
-            <span>&larr; stronger team &middot; weaker team &rarr;</span>
-            <span>#365 &middot; Worst</span>
+          <div class="net-bin-legend" aria-label="NET ranking color bins">
+            <div class="net-bin" style="--bin-color:#1a9850">
+              <span class="net-bin-swatch"></span>
+              <span class="net-bin-label">Best</span>
+              <span class="net-bin-range">#1-73</span>
+            </div>
+            <div class="net-bin" style="--bin-color:#91cf60">
+              <span class="net-bin-swatch"></span>
+              <span class="net-bin-label">Strong</span>
+              <span class="net-bin-range">#74-146</span>
+            </div>
+            <div class="net-bin" style="--bin-color:#d9ef8b">
+              <span class="net-bin-swatch"></span>
+              <span class="net-bin-label">Solid</span>
+              <span class="net-bin-range">#147-219</span>
+            </div>
+            <div class="net-bin" style="--bin-color:#fc8d59">
+              <span class="net-bin-swatch"></span>
+              <span class="net-bin-label">Weak</span>
+              <span class="net-bin-range">#220-292</span>
+            </div>
+            <div class="net-bin" style="--bin-color:#d73027">
+              <span class="net-bin-swatch"></span>
+              <span class="net-bin-label">Worst</span>
+              <span class="net-bin-range">#293-365</span>
+            </div>
           </div>
         </div>
       </div>

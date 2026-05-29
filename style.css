@@ -13,7 +13,7 @@
   --line: #2a313b;
   --font-display: "Fraunces", Georgia, serif;
   --font-body: "Archivo", system-ui, sans-serif;
-  --maxw: 760px;
+  --maxw: 960px;
 }
 
 * { box-sizing: border-box; }
@@ -52,7 +52,7 @@ body {
   max-width: 42ch;
 }
 
-.hero-inner { max-width: 900px; }
+.hero-inner { max-width: 1120px; }
 
 .eyebrow {
   font-family: var(--font-body);
@@ -126,7 +126,7 @@ h3 {
 
 /* ---------- VIZ SECTION ---------- */
 .viz-section {
-  max-width: 900px;
+  max-width: 1320px;
   margin: 0 auto;
   padding: 3rem 1.5rem 5rem;
 }
@@ -139,10 +139,11 @@ h3 {
 }
 
 #chart {
+  width: 100%;
   background: var(--bg-soft);
   border: 1px solid var(--line);
   border-radius: 12px;
-  padding: 1rem;
+  padding: 0.85rem;
 }
 
 .axis-explainer {
@@ -166,11 +167,11 @@ h3 {
 }
 
 /* axes */
-.axis text { fill: var(--ink-soft); font-size: 11px; }
+.axis text { fill: var(--ink-soft); font-size: 12px; }
 .axis line, .axis path { stroke: var(--line); }
-.axis-label { fill: var(--ink); font-size: 13px; font-weight: 500; }
-.median-line { stroke: var(--ink-soft); stroke-dasharray: 4 4; opacity: 0.4; }
-.quadrant-label { fill: var(--ink-soft); font-size: 11px; opacity: 0.7; }
+.axis-label { fill: var(--ink); font-size: 14px; font-weight: 500; }
+.median-line { stroke: var(--ink-soft); stroke-dasharray: 4 4; opacity: 0.45; }
+.quadrant-label { fill: var(--ink-soft); font-size: 12px; opacity: 0.72; }
 
 .dot { cursor: pointer; transition: r 0.12s ease, opacity 0.12s ease, filter 0.2s ease; }
 .dot:hover { stroke: var(--ink); stroke-width: 1.5px; }
@@ -227,7 +228,7 @@ h3 {
 
 /* ---------- NET COLOR LEGEND ---------- */
 .net-legend {
-  max-width: 460px;
+  max-width: 520px;
   margin: 0 0 2rem;
 }
 
@@ -250,33 +251,42 @@ h3 {
   line-height: 1.45;
 }
 
-.net-legend-bar {
-  height: 14px;
-  border-radius: 7px;
-  border: 1px solid var(--line);
-  /* matches interpolateRdYlGn: green (best) -> yellow -> red (worst) */
-  background: linear-gradient(
-    to right,
-    #1a9850,
-    #91cf60,
-    #d9ef8b,
-    #fee08b,
-    #fc8d59,
-    #d73027
-  );
-}
-
-.net-legend-labels {
+.net-bin-legend {
   display: flex;
-  justify-content: space-between;
-  margin-top: 0.4rem;
-  font-size: 0.78rem;
-  color: var(--ink-soft);
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  margin-top: 0.8rem;
 }
 
-.net-legend-labels span:nth-child(2) {
+.net-bin {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.16rem;
+  min-width: 88px;
+  padding: 0.55rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.net-bin-swatch {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--bin-color);
+  border: 1px solid rgba(0, 0, 0, 0.18);
+}
+
+.net-bin-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.net-bin-range {
+  font-size: 0.72rem;
   color: var(--ink-soft);
-  opacity: 0.7;
 }
 
 .net-legend-link {
@@ -898,7 +908,7 @@ h3 {
 .team-annotation {
   fill: var(--ink-soft);
   font-family: var(--font-body);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   pointer-events: none;
 }
