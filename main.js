@@ -192,9 +192,11 @@ function updateDots() {
       if (searchTerm.length >= 2) return false;
       const confDim = selectedConferences.size > 0 && !selectedConferences.has(d.conferenceId);
       const maxNet = d3.max(allData, (d) => d[NET_COL]);
-      const annotDim = annotationLimit > 0 && d[NET_COL] > annotationLimit;
-      const annotBottomDim = annotationBottomLimit > 0 && d[NET_COL] < maxNet - annotationBottomLimit + 1;
-      return confDim || annotDim || annotBottomDim;
+      const inTop = annotationLimit > 0 && d[NET_COL] <= annotationLimit;
+      const inBottom = annotationBottomLimit > 0 && d[NET_COL] >= maxNet - annotationBottomLimit + 1;
+      const hasAnnotFilter = annotationLimit > 0 || annotationBottomLimit > 0;
+      const annotDim = hasAnnotFilter && !inTop && !inBottom;
+      return confDim || annotDim;
     })
     .on("mouseover", function (event, d) {
       d3.select(this).attr("r", 8.5);
