@@ -51,6 +51,7 @@ const selectedConferences = new Set();
 let selectedTeamId = null;
 let searchTerm = "";
 let annotationLimit = 0;
+let annotationBottomLimit = 0;
  
 let x, y, color, svg, tooltip;
 let chartWidth, chartHeight;
@@ -190,8 +191,10 @@ function updateDots() {
     .classed("dimmed", (d) => {
       if (searchTerm.length >= 2) return false;
       const confDim = selectedConferences.size > 0 && !selectedConferences.has(d.conferenceId);
+      const maxNet = d3.max(allData, (d) => d[NET_COL]);
       const annotDim = annotationLimit > 0 && d[NET_COL] > annotationLimit;
-      return confDim || annotDim;
+      const annotBottomDim = annotationBottomLimit > 0 && d[NET_COL] < maxNet - annotationBottomLimit + 1;
+      return confDim || annotDim || annotBottomDim;
     })
     .on("mouseover", function (event, d) {
       d3.select(this).attr("r", 8.5);
@@ -230,9 +233,13 @@ function updateAnnotations(visible) {
   const layer = svg.append("g").attr("class", "annotations-layer");
   const st = searchTerm.toLowerCase();
 
+  const maxNet = d3.max(allData, (d) => d[NET_COL]);
   const labelTeams = st.length >= 2
     ? visible.filter((d) => d.teamMarket.toLowerCase().includes(st))
-    : visible.filter((d) => d[NET_COL] <= annotationLimit).sort((a, b) => a[NET_COL] - b[NET_COL]);
+    : [
+        ...(annotationLimit > 0 ? visible.filter((d) => d[NET_COL] <= annotationLimit).sort((a, b) => a[NET_COL] - b[NET_COL]) : []),
+        ...(annotationBottomLimit > 0 ? visible.filter((d) => d[NET_COL] >= maxNet - annotationBottomLimit + 1).sort((a, b) => b[NET_COL] - a[NET_COL]) : []),
+      ];
 
   labelTeams.forEach((d) => {
     layer.append("text")
@@ -248,6 +255,11 @@ function buildMetaButtons() {
 
   document.getElementById("annot-limit").addEventListener("input", function () {
     annotationLimit = Math.max(0, parseInt(this.value) || 0);
+    updateDots();
+  });
+
+  document.getElementById("annot-bottom-limit").addEventListener("input", function () {
+    annotationBottomLimit = Math.max(0, parseInt(this.value) || 0);
     updateDots();
   });
 
