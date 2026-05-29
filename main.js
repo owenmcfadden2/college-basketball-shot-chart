@@ -571,6 +571,26 @@ function buildCourtChart(vals) {
     .attr("x", "-200%").attr("y", "-200%").attr("width", "500%").attr("height", "500%")
     .append("feGaussianBlur").attr("in", "SourceGraphic").attr("stdDeviation", 12);
 
+  // Border glow filter — tight blur applied to colored strokes only
+  const borderGlowId = `bg${Math.floor(Math.random() * 1e8)}`;
+  defs.append("filter").attr("id", borderGlowId)
+    .attr("x", "-60%").attr("y", "-60%").attr("width", "220%").attr("height", "220%")
+    .append("feGaussianBlur").attr("in", "SourceGraphic").attr("stdDeviation", 10);
+
+  // Border glow layer — same path drawn 5 times to saturate the halo
+  const borderGlowLayer = svgEl.append("g").attr("opacity", 1);
+  zDefs.forEach((z) => {
+    for (let i = 0; i < 3; i++) {
+      borderGlowLayer.append("path")
+        .attr("d", z.path)
+        .attr("fill", "none")
+        .attr("fill-rule", z.fillRule)
+        .attr("stroke", z.pct != null ? pctScale(z.pct) : "#2a2a2a")
+        .attr("stroke-width", 14)
+        .attr("filter", `url(#${borderGlowId})`);
+    }
+  });
+
   // Glow underlay — blurred zone colors drawn beneath the sharp fills
   const glowLayer = svgEl.append("g").attr("opacity", 0.55);
   zDefs.forEach((z) => {
