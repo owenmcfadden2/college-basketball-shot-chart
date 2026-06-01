@@ -73,9 +73,12 @@ d3.csv("data/shot_data.csv", d3.autoType).then((raw) => {
 });
  
 function buildChartShell() {
-  const container = document.getElementById("chart");
-  const width = container.clientWidth - MARGIN.left - MARGIN.right;
-  const height = 580 - MARGIN.top - MARGIN.bottom;
+  // Fixed virtual drawing canvas. The viewBox scales this to fit the DOM.
+  const VW = 820;   // virtual width
+  const VH = 640;   // virtual height
+ 
+  const width = VW - MARGIN.left - MARGIN.right;
+  const height = VH - MARGIN.top - MARGIN.bottom;
   chartWidth = width;
   chartHeight = height;
  
@@ -89,8 +92,10 @@ function buildChartShell() {
  
   svg = d3.select("#chart")
     .append("svg")
-    .attr("width", width + MARGIN.left + MARGIN.right)
-    .attr("height", height + MARGIN.top + MARGIN.bottom)
+    .attr("viewBox", `0 0 ${VW} ${VH}`)
+    .attr("preserveAspectRatio", "xMidYMid meet")
+    .attr("width", "100%")
+    .attr("height", "100%")
     .append("g")
     .attr("transform", `translate(${MARGIN.left},${MARGIN.top})`);
  
@@ -123,7 +128,7 @@ function buildChartShell() {
     .attr("x1", x(xMed)).attr("x2", x(xMed)).attr("y1", 0).attr("y2", height);
   svg.append("line").attr("class", "median-line")
     .attr("x1", 0).attr("x2", width).attr("y1", y(yMed)).attr("y2", y(yMed));
-
+ 
   // quadrant fills + labels
   const qDefs = [
     { x1: x(xMed), y1: 0,       x2: width,   y2: y(yMed), fill: "#4cc38a", lbl: "Elite Offenses"        },
@@ -194,7 +199,7 @@ function updateDots() {
       const maxNet = d3.max(allData, (d) => d[NET_COL]);
       const inTop = annotationLimit > 0 && d[NET_COL] <= annotationLimit;
       const inBottom = annotationBottomLimit > 0 && d[NET_COL] >= maxNet - annotationBottomLimit + 1;
-      const hasAnnotFilter = annotationLimit > 0 || annotationBottomLimit > 0;
+      const hasAnnotFilter = !storyActive && (annotationLimit > 0 || annotationBottomLimit > 0);
       const annotDim = hasAnnotFilter && !inTop && !inBottom;
       return confDim || annotDim;
     })
@@ -232,6 +237,7 @@ function updateDots() {
 
 function updateAnnotations(visible) {
   svg.selectAll(".annotations-layer").remove();
+  if (storyActive) return;   // no annotation labels during the story
   const layer = svg.append("g").attr("class", "annotations-layer");
   const st = searchTerm.toLowerCase();
 
@@ -305,6 +311,17 @@ function buildConferenceDropdown() {
   document.getElementById("conf-clear").addEventListener("click", () => {
     selectedConferences.clear();
     menu.selectAll("input").property("checked", false);
+
+    // also clear search
+    searchTerm = "";
+    document.getElementById("team-search").value = "";
+
+    // also clear top/bottom annotation limits
+    annotationLimit = 0;
+    annotationBottomLimit = 0;
+    document.getElementById("annot-limit").value = "";
+    document.getElementById("annot-bottom-limit").value = "";
+
     updateDots();
   });
 }
@@ -339,6 +356,7 @@ const ZONES = [
 const dietBarScale = d3.scaleLinear().domain([0, 0.5]).range([0, 110]).clamp(true);
  
 function showTeamPanel(d) {
+  document.body.classList.add("panel-open");
   const panel = d3.select("#team-panel");
   panel.classed("active", true);
   panel.html("");
@@ -386,6 +404,7 @@ function showTeamPanel(d) {
 }
  
 function closeTeamPanel() {
+  document.body.classList.remove("panel-open");
   const panel = d3.select("#team-panel");
   panel.classed("active", false);
   panel.html('<p class="team-panel-hint">Click any team\'s dot to see its full shot profile.</p>');
@@ -401,6 +420,7 @@ function showEmptyBrush() {
 function avg(teams, col) { return d3.mean(teams, (d) => d[col]); }
  
 function showGroupPanel(teams) {
+  document.body.classList.add("panel-open");
   selectedTeamId = null;
   svg.selectAll(".dot").classed("selected", false).attr("r", 5.5);
  
@@ -702,3 +722,161 @@ function buildCourtChart(vals) {
 
   return wrap.node();
 }
+
+/* ============================================================
+   STORY MODULE  —  paste this block into main.js
+   Place it AFTER buildChartShell() / updateDots() are defined.
+   It reuses your existing globals: x, y, svg, allData, chartWidth,
+   chartHeight, X_COL, Y_COL, NET_COL, updateDots(), color.
+ 
+   Requires Scrollama (added via <script> in index.html).
+   ============================================================ */
+ 
+// Teams the story spotlights, by exact teamMarket string.
+const STORY_TEAMS = {
+  elite:    ["Michigan", "Duke", "Florida"],                 // TR: have both
+  selective:["Houston", "Arizona", "Purdue", "Michigan St."],// TL: low vol, high qual
+  wasteful: ["Cal Poly", "Elon", "Youngstown St."],          // BR: high vol, low qual
+};
+ 
+let storyActive = false;   // when true, free-exploration dimming is suspended
+let STORY_MED = {};        // cached medians
+ 
+function storyMedians() {
+  if (STORY_MED.x == null) {
+    STORY_MED.x = d3.median(allData, (d) => d[X_COL]);
+    STORY_MED.y = d3.median(allData, (d) => d[Y_COL]);
+  }
+  return STORY_MED;
+}
+ 
+// Clear every story-applied class/state from the dots.
+function resetStoryDots() {
+  svg.selectAll(".dot")
+    .classed("story-dim", false)
+    .classed("story-hi", false)
+    .attr("r", (d) => (d.teamId === selectedTeamId ? 7.5 : 5.5));
+  svg.selectAll(".story-annotation").remove();
+  svg.selectAll(".story-zone-veil").remove();
+  svg.selectAll(".annotations-layer").remove();   // clear top/bottom labels on re-entry
+  svg.selectAll(".dot").classed("dimmed", false);
+}
+ 
+// Helper: does this datum match a list of teamMarket names?
+function inList(d, names) { return names.includes(d.teamMarket); }
+ 
+// Draw a small text callout near a team's dot.
+function storyLabel(d, text, dy) {
+  svg.append("text")
+    .attr("class", "story-annotation")
+    .attr("x", x(d[X_COL]) + 9)
+    .attr("y", y(d[Y_COL]) + (dy || 4))
+    .text(text || d.teamMarket);
+}
+ 
+/* ---- the steps ---------------------------------------------------------- */
+/* Each step is a pure function of the dot selection. Steps are idempotent:
+   they fully reset first, then apply their own emphasis.                    */
+ 
+function applyStoryStep(step) {
+  storyActive = true;
+  document.body.classList.add("story-mode");   // <-- hides controls via CSS
+  resetStoryDots();
+  const med = storyMedians();
+  const dots = svg.selectAll(".dot");
+ 
+  switch (step) {
+    case 0:
+      break;
+ 
+    case 1:
+      dots.classed("story-dim", (d) => !inList(d, STORY_TEAMS.elite));
+      dots.filter((d) => inList(d, STORY_TEAMS.elite))
+        .classed("story-hi", true).attr("r", 8.5);
+      svg.selectAll(".dot").filter((d) => inList(d, STORY_TEAMS.elite))
+        .each(function (d) { storyLabel(d, d.teamMarket, -10); });
+      break;
+ 
+    case 2:
+      dots.classed("story-dim", (d) => d[X_COL] < med.x);
+      break;
+ 
+    case 3:
+      dots.classed("story-dim", (d) => !inList(d, STORY_TEAMS.wasteful));
+      dots.filter((d) => inList(d, STORY_TEAMS.wasteful))
+        .classed("story-hi", true).attr("r", 8.5);
+      svg.selectAll(".dot").filter((d) => inList(d, STORY_TEAMS.wasteful))
+        .each(function (d) { storyLabel(d, `${d.teamMarket} · NET #${d[NET_COL]}`, -10); });
+      break;
+ 
+    case 4:
+      dots.classed("story-dim", (d) => !inList(d, STORY_TEAMS.selective));
+      dots.filter((d) => inList(d, STORY_TEAMS.selective))
+        .classed("story-hi", true).attr("r", 8.5);
+      svg.selectAll(".dot").filter((d) => inList(d, STORY_TEAMS.selective))
+        .each(function (d) { storyLabel(d, `${d.teamMarket} · NET #${d[NET_COL]}`, -10); });
+      break;
+ 
+    case 5:
+      dots.classed("story-dim", (d) => d[Y_COL] < med.y);
+      break;
+ 
+    case 6:
+      storyActive = false;
+      document.body.classList.remove("story-mode");
+      resetStoryDots();
+      // default annotation: spotlight top 10 and bottom 10 to cut overplotting
+      annotationLimit = 10;
+      annotationBottomLimit = 10;
+      document.getElementById("annot-limit").value = 10;
+      document.getElementById("annot-bottom-limit").value = 10;
+      updateDots();
+      break;
+  }
+}
+
+/* ============================================================
+   SCROLLAMA WIRING  —  paste at the very BOTTOM of main.js
+   (after the d3.csv(...).then(...) block and all functions).
+   ============================================================ */
+ 
+function initStoryScroll() {
+  if (typeof scrollama === "undefined") return; // library not loaded yet
+ 
+  const scroller = scrollama();
+ 
+  scroller
+    .setup({
+      step: ".story-step",
+      offset: 0.6,       // trigger when step is 60% up the viewport
+      progress: false,
+    })
+    .onStepEnter((response) => {
+      const stepIndex = +response.element.dataset.step;
+      applyStoryStep(stepIndex);
+      response.element.classList.add("is-active");
+    })
+    .onStepExit((response) => {
+      response.element.classList.remove("is-active");
+    });
+ 
+  window.addEventListener("resize", scroller.resize);
+}
+ 
+// allData loads asynchronously; wait until the chart exists, then wire scroll.
+function waitForChartThenScroll() {
+  if (svg && allData.length) {
+    initStoryStep0Guard();
+    initStoryScroll();
+  } else {
+    setTimeout(waitForChartThenScroll, 120);
+  }
+}
+ 
+// Before the reader scrolls into the story, make sure the chart starts neutral.
+function initStoryStep0Guard() {
+  // nothing emphasized until the first step enters
+  storyActive = false;
+}
+ 
+waitForChartThenScroll();

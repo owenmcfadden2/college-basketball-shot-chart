@@ -2,7 +2,7 @@
    The Efficiency Frontier - styles
    Editorial / sports-analytics aesthetic
    ============================================================ */
-
+ 
 :root {
   --bg: #0e1116;
   --bg-soft: #161b22;
@@ -15,11 +15,11 @@
   --font-body: "Archivo", system-ui, sans-serif;
   --maxw: 960px;
 }
-
+ 
 * { box-sizing: border-box; }
-
+ 
 html { scroll-behavior: smooth; }
-
+ 
 body {
   margin: 0;
   background: var(--bg);
@@ -28,7 +28,7 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
-
+ 
 /* ---------- HERO ---------- */
 .hero {
   min-height: 92vh;
@@ -43,7 +43,7 @@ body {
     radial-gradient(800px 500px at 0% 110%, rgba(76,195,138,0.12), transparent 60%),
     var(--bg);
 }
-
+ 
 .hero-sub {
   font-family: var(--font-body);
   font-size: clamp(1rem, 2.2vw, 1.35rem);
@@ -51,9 +51,9 @@ body {
   margin-top: 1.2rem;
   max-width: 42ch;
 }
-
+ 
 .hero-inner { max-width: 1120px; }
-
+ 
 .eyebrow {
   font-family: var(--font-body);
   text-transform: uppercase;
@@ -62,7 +62,7 @@ body {
   color: var(--ink-soft);
   margin: 0 0 1.2rem;
 }
-
+ 
 .hero h1 {
   font-family: var(--font-display);
   font-weight: 900;
@@ -71,18 +71,18 @@ body {
   margin: 0;
   letter-spacing: -0.02em;
 }
-
+ 
 .hero h1 .accent { color: var(--accent); font-style: italic; }
-
+ 
 .dek {
   font-size: clamp(1.05rem, 2.5vw, 1.5rem);
   color: var(--ink-soft);
   max-width: 38ch;
   margin-top: 1.6rem;
 }
-
+ 
 .dek em { color: var(--ink); font-style: italic; }
-
+ 
 .scroll-cue {
   position: absolute;
   bottom: 2rem;
@@ -92,12 +92,12 @@ body {
   font-size: 1.6rem;
   animation: bob 1.8s ease-in-out infinite;
 }
-
+ 
 @keyframes bob {
   0%, 100% { transform: translate(-50%, 0); }
   50% { transform: translate(-50%, 8px); }
 }
-
+ 
 /* ---------- PROSE ---------- */
 .prose {
   max-width: var(--maxw);
@@ -105,9 +105,9 @@ body {
   padding: 4rem 1.5rem;
   font-size: 1.12rem;
 }
-
+ 
 .prose p { color: var(--ink); }
-
+ 
 h2 {
   font-family: var(--font-display);
   font-weight: 600;
@@ -115,7 +115,7 @@ h2 {
   letter-spacing: -0.01em;
   margin-bottom: 0.6rem;
 }
-
+ 
 h3 {
   font-family: var(--font-body);
   font-weight: 600;
@@ -123,21 +123,21 @@ h3 {
   color: var(--accent);
   margin-top: 1.8rem;
 }
-
+ 
 /* ---------- VIZ SECTION ---------- */
 .viz-section {
   max-width: 1320px;
   margin: 0 auto;
   padding: 3rem 1.5rem 5rem;
 }
-
+ 
 .viz-caption {
   color: var(--ink-soft);
   font-size: 0.98rem;
   max-width: 60ch;
   margin-bottom: 2rem;
 }
-
+ 
 #chart {
   width: 100%;
   background: var(--bg-soft);
@@ -145,7 +145,16 @@ h3 {
   border-radius: 12px;
   padding: 0.85rem;
 }
-
+ 
+/* force the chart SVG to scale to its container, never overflow it.
+   this is what keeps the scrolly grid column from being blown out. */
+#chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+ 
 .axis-explainer {
   background: var(--bg-soft);
   border: 1px solid var(--line);
@@ -154,30 +163,33 @@ h3 {
   margin-top: 1rem;
   color: var(--ink);
 }
-
+ 
 .axis-explainer h3 {
   font-size: 1rem;
   margin: 0 0 0.4rem;
 }
-
+ 
 .axis-explainer p {
   margin: 0.25rem 0;
   color: var(--ink-soft);
   line-height: 1.45;
 }
-
+ 
 /* axes */
 .axis text { fill: var(--ink-soft); font-size: 12px; }
 .axis line, .axis path { stroke: var(--line); }
 .axis-label { fill: var(--ink); font-size: 14px; font-weight: 500; }
 .median-line { stroke: var(--ink-soft); stroke-dasharray: 4 4; opacity: 0.45; }
 .quadrant-label { fill: var(--ink-soft); font-size: 12px; opacity: 0.72; }
-
-.dot { cursor: pointer; transition: r 0.12s ease, opacity 0.12s ease, filter 0.2s ease; }
+ 
+.dot {
+  cursor: pointer;
+  transition: r 0.12s ease, opacity 0.35s ease, filter 0.2s ease;
+}
 .dot:hover { stroke: var(--ink); stroke-width: 1.5px; }
 .dot.dim { opacity: 0.12; }
 .dot.dimmed { opacity: 0.15; filter: blur(1.5px); pointer-events: none; }
-
+ 
 /* ---------- VIZ HEADER (two-column) ---------- */
 .viz-header {
   display: flex;
@@ -187,17 +199,17 @@ h3 {
   margin-bottom: 2rem;
   flex-wrap: wrap;
 }
-
+ 
 .viz-header-text {
   flex: 1 1 320px;
   min-width: 280px;
 }
-
+ 
 .viz-header .net-legend {
   flex: 0 1 460px;
   margin: 0;            /* override the old bottom margin */
 }
-
+ 
 /* ---------- TOOLTIP ---------- */
 .tooltip {
   position: fixed;
@@ -213,10 +225,10 @@ h3 {
   z-index: 10;
   box-shadow: 0 8px 24px rgba(0,0,0,0.4);
 }
-
+ 
 .tooltip .t-name { font-weight: 700; }
 .tooltip .t-row { color: #444; font-weight: 500; }
-
+ 
 /* ---------- FOOTER ---------- */
 .site-footer {
   border-top: 1px solid var(--line);
@@ -225,39 +237,39 @@ h3 {
   color: var(--ink-soft);
   font-size: 0.9rem;
 }
-
+ 
 /* ---------- NET COLOR LEGEND ---------- */
 .net-legend {
   max-width: 520px;
   margin: 0 0 2rem;
 }
-
+ 
 .net-legend-head {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
   margin-bottom: 0.6rem;
 }
-
+ 
 .net-legend-title {
   font-weight: 600;
   font-size: 0.95rem;
   color: var(--ink);
 }
-
+ 
 .net-legend-note {
   font-size: 0.82rem;
   color: var(--ink-soft);
   line-height: 1.45;
 }
-
+ 
 .net-bin-legend {
   display: flex;
   gap: 0.55rem;
   flex-wrap: wrap;
   margin-top: 0.8rem;
 }
-
+ 
 .net-bin {
   display: flex;
   flex-direction: column;
@@ -269,7 +281,7 @@ h3 {
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.02);
 }
-
+ 
 .net-bin-swatch {
   width: 100%;
   height: 10px;
@@ -277,18 +289,18 @@ h3 {
   background: var(--bin-color);
   border: 1px solid rgba(0, 0, 0, 0.18);
 }
-
+ 
 .net-bin-label {
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--ink);
 }
-
+ 
 .net-bin-range {
   font-size: 0.72rem;
   color: var(--ink-soft);
 }
-
+ 
 .net-legend-link {
   color: var(--accent);
   text-decoration: none;
@@ -296,11 +308,11 @@ h3 {
   border-bottom: 1px solid transparent;
   transition: border-color 0.15s ease;
 }
-
+ 
 .net-legend-link:hover {
   border-bottom-color: var(--accent);
 }
-
+ 
 /* ---------- CONFERENCE FILTER ---------- */
 .conf-filter {
   display: flex;
@@ -309,11 +321,11 @@ h3 {
   margin-bottom: 1.5rem;
   flex-wrap: wrap;
 }
-
+ 
 .conf-dropdown {
   position: relative;
 }
-
+ 
 .conf-button {
   background: var(--bg-soft);
   color: var(--ink);
@@ -328,11 +340,11 @@ h3 {
   gap: 0.5rem;
   transition: border-color 0.15s ease;
 }
-
+ 
 .conf-button:hover { border-color: var(--accent); }
-
+ 
 .conf-caret { font-size: 0.7rem; color: var(--ink-soft); }
-
+ 
 .conf-menu {
   display: none;
   position: absolute;
@@ -348,9 +360,9 @@ h3 {
   z-index: 20;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
 }
-
+ 
 .conf-dropdown.open .conf-menu { display: block; }
-
+ 
 .conf-option {
   display: flex;
   align-items: center;
@@ -360,25 +372,25 @@ h3 {
   cursor: pointer;
   font-size: 0.9rem;
 }
-
+ 
 .conf-option:hover { background: rgba(255, 255, 255, 0.04); }
-
+ 
 .conf-option input {
   accent-color: var(--accent);
   width: 15px;
   height: 15px;
   cursor: pointer;
 }
-
+ 
 .conf-rank {
   color: var(--ink-soft);
   font-size: 0.8rem;
   width: 1.6rem;
   flex-shrink: 0;
 }
-
+ 
 .conf-name { flex: 1; }
-
+ 
 .conf-count {
   color: var(--ink-soft);
   font-size: 0.78rem;
@@ -386,7 +398,7 @@ h3 {
   padding: 0.1rem 0.45rem;
   border-radius: 10px;
 }
-
+ 
 .conf-clear {
   background: none;
   border: 1px solid var(--line);
@@ -398,36 +410,36 @@ h3 {
   cursor: pointer;
   transition: color 0.15s ease, border-color 0.15s ease;
 }
-
+ 
 .conf-clear:hover { color: var(--ink); border-color: var(--ink-soft); }
-
+ 
 .conf-status {
   color: var(--ink-soft);
   font-size: 0.85rem;
 }
-
+ 
 .conf-footnote {
   font-size: 0.8rem;
   color: var(--ink-soft);
   margin: -0.5rem 0 1.5rem;
 }
-
+ 
 .conf-footnote a {
   color: var(--accent);
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: border-color 0.15s ease;
 }
-
+ 
 .conf-footnote a:hover { border-bottom-color: var(--accent); }
-
+ 
 .byline {
   font-size: 0.95rem;
   color: var(--ink-soft);
   margin-top: 1.8rem;
   letter-spacing: 0.01em;
 }
-
+ 
 .byline-label {
   text-transform: uppercase;
   letter-spacing: 0.18em;
@@ -435,22 +447,22 @@ h3 {
   margin-right: 0.5rem;
   opacity: 0.7;
 }
-
+ 
 .byline a {
   color: var(--ink-soft);
   text-decoration: none;
   border-bottom: 1px solid var(--line);
   transition: color 0.15s ease, border-color 0.15s ease;
 }
-
+ 
 .byline a:hover { color: var(--accent); border-bottom-color: var(--accent); }
-
+ 
 /* ---------- SELECTED DOT ---------- */
 .dot.selected {
   stroke: var(--ink);
   stroke-width: 2px;
 }
-
+ 
 /* ---------- TEAM DETAIL PANEL ---------- */
 .team-panel {
   margin-top: 1.5rem;
@@ -460,14 +472,14 @@ h3 {
   padding: 1.5rem;
   min-height: 80px;
 }
-
+ 
 .team-panel-hint {
   color: var(--ink-soft);
   font-size: 0.95rem;
   margin: 0;
   text-align: center;
 }
-
+ 
 .tp-header {
   display: flex;
   justify-content: space-between;
@@ -476,20 +488,20 @@ h3 {
   padding-bottom: 1rem;
   margin-bottom: 1.2rem;
 }
-
+ 
 .tp-name {
   font-family: var(--font-display);
   font-size: 1.7rem;
   margin: 0;
   color: var(--ink);
 }
-
+ 
 .tp-sub {
   color: var(--ink-soft);
   font-size: 0.9rem;
   margin: 0.3rem 0 0;
 }
-
+ 
 .tp-close {
   background: none;
   border: none;
@@ -500,9 +512,9 @@ h3 {
   padding: 0 0.3rem;
   transition: color 0.15s ease;
 }
-
+ 
 .tp-close:hover { color: var(--accent); }
-
+ 
 /* headline stats */
 .tp-headline {
   display: flex;
@@ -510,33 +522,33 @@ h3 {
   margin-bottom: 1.6rem;
   flex-wrap: wrap;
 }
-
+ 
 .tp-stat {
   flex: 1 1 220px;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 10px;
   padding: 1rem 1.1rem;
 }
-
+ 
 .tp-stat-label {
   text-transform: uppercase;
   letter-spacing: 0.12em;
   font-size: 0.72rem;
   color: var(--ink-soft);
 }
-
+ 
 .tp-stat-value {
   font-family: var(--font-display);
   font-size: 1.9rem;
   font-weight: 600;
   margin: 0.2rem 0;
 }
-
+ 
 .tp-stat-note {
   font-size: 0.8rem;
   color: var(--ink-soft);
 }
-
+ 
 .tp-stat-bar {
   height: 6px;
   background: rgba(255, 255, 255, 0.08);
@@ -544,17 +556,17 @@ h3 {
   margin: 0.7rem 0 0.4rem;
   overflow: hidden;
 }
-
+ 
 .tp-stat-bar-fill {
   height: 100%;
   border-radius: 3px;
 }
-
+ 
 .tp-stat-pct {
   font-size: 0.78rem;
   color: var(--ink-soft);
 }
-
+ 
 /* zone table */
 .tp-section-title {
   font-family: var(--font-body);
@@ -564,7 +576,7 @@ h3 {
   color: var(--accent);
   margin: 0 0 0.8rem;
 }
-
+ 
 .tp-zone-row {
   display: grid;
   grid-template-columns: 1.4fr 1.6fr 1.4fr;
@@ -573,7 +585,7 @@ h3 {
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   font-size: 0.92rem;
 }
-
+ 
 .tp-zone-head {
   font-size: 0.75rem;
   text-transform: uppercase;
@@ -581,15 +593,15 @@ h3 {
   color: var(--ink-soft);
   border-bottom: 1px solid var(--line);
 }
-
+ 
 .tp-zone-label { color: var(--ink); }
-
+ 
 .tp-zone-cell {
   display: flex;
   align-items: center;
   gap: 0.6rem;
 }
-
+ 
 .tp-bar {
   display: inline-block;
   height: 9px;
@@ -597,12 +609,12 @@ h3 {
   border-radius: 4px;
   opacity: 0.55;
 }
-
+ 
 .tp-val {
   font-variant-numeric: tabular-nums;
   color: var(--ink);
 }
-
+ 
 .tp-pct-chip {
   font-size: 0.72rem;
   font-weight: 600;
@@ -611,174 +623,7 @@ h3 {
   border-radius: 10px;
   font-variant-numeric: tabular-nums;
 }
-
-/* ---------- SELECTED DOT ---------- */
-.dot.selected {
-  stroke: var(--ink);
-  stroke-width: 2px;
-}
-
-/* ---------- TEAM DETAIL PANEL ---------- */
-.team-panel {
-  margin-top: 1.5rem;
-  background: var(--bg-soft);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 1.5rem;
-  min-height: 80px;
-}
-
-.team-panel-hint {
-  color: var(--ink-soft);
-  font-size: 0.95rem;
-  margin: 0;
-  text-align: center;
-}
-
-.tp-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 1rem;
-  margin-bottom: 1.2rem;
-}
-
-.tp-name {
-  font-family: var(--font-display);
-  font-size: 1.7rem;
-  margin: 0;
-  color: var(--ink);
-}
-
-.tp-sub {
-  color: var(--ink-soft);
-  font-size: 0.9rem;
-  margin: 0.3rem 0 0;
-}
-
-.tp-close {
-  background: none;
-  border: none;
-  color: var(--ink-soft);
-  font-size: 1.6rem;
-  line-height: 1;
-  cursor: pointer;
-  padding: 0 0.3rem;
-  transition: color 0.15s ease;
-}
-
-.tp-close:hover { color: var(--accent); }
-
-/* headline stats */
-.tp-headline {
-  display: flex;
-  gap: 1.5rem;
-  margin-bottom: 1.6rem;
-  flex-wrap: wrap;
-}
-
-.tp-stat {
-  flex: 1 1 220px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 10px;
-  padding: 1rem 1.1rem;
-}
-
-.tp-stat-label {
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 0.72rem;
-  color: var(--ink-soft);
-}
-
-.tp-stat-value {
-  font-family: var(--font-display);
-  font-size: 1.9rem;
-  font-weight: 600;
-  margin: 0.2rem 0;
-}
-
-.tp-stat-note {
-  font-size: 0.8rem;
-  color: var(--ink-soft);
-}
-
-.tp-stat-bar {
-  height: 6px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 3px;
-  margin: 0.7rem 0 0.4rem;
-  overflow: hidden;
-}
-
-.tp-stat-bar-fill {
-  height: 100%;
-  border-radius: 3px;
-}
-
-.tp-stat-pct {
-  font-size: 0.78rem;
-  color: var(--ink-soft);
-}
-
-/* zone table */
-.tp-section-title {
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--accent);
-  margin: 0 0 0.8rem;
-}
-
-.tp-zone-row {
-  display: grid;
-  grid-template-columns: 1.4fr 1.6fr 1.4fr;
-  align-items: center;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: 0.92rem;
-}
-
-.tp-zone-head {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--ink-soft);
-  border-bottom: 1px solid var(--line);
-}
-
-.tp-zone-label { color: var(--ink); }
-
-.tp-zone-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.tp-bar {
-  display: inline-block;
-  height: 9px;
-  background: var(--accent);
-  border-radius: 4px;
-  opacity: 0.55;
-}
-
-.tp-val {
-  font-variant-numeric: tabular-nums;
-  color: var(--ink);
-}
-
-.tp-pct-chip {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: #0e1116;
-  padding: 0.1rem 0.45rem;
-  border-radius: 10px;
-  font-variant-numeric: tabular-nums;
-}
-
+ 
 /* ---------- BRUSH ---------- */
 .brush .selection {
   fill: var(--accent);
@@ -787,12 +632,12 @@ h3 {
   stroke-width: 1;
   stroke-dasharray: 4 3;
 }
-
+ 
 .brush .handle { fill: var(--accent); fill-opacity: 0.4; }
-
+ 
 /* let dot hovers/clicks pass through the brush overlay */
 .brush .overlay { cursor: crosshair; }
-
+ 
 /* ---------- CONFERENCE LINK (homepage status) ---------- */
 .conf-link {
   color: var(--accent);
@@ -801,31 +646,31 @@ h3 {
   border-bottom: 1px solid transparent;
   transition: border-color 0.15s ease;
 }
-
+ 
 .conf-link:hover { border-bottom-color: var(--accent); }
-
+ 
 /* ---------- CONFERENCE PROFILE PAGE ---------- */
 .conf-nav {
   padding: 1.5rem 8vw;
   border-bottom: 1px solid var(--line);
 }
-
+ 
 .conf-nav-back {
   color: var(--ink-soft);
   text-decoration: none;
   font-size: 0.9rem;
   transition: color 0.15s ease;
 }
-
+ 
 .conf-nav-back:hover { color: var(--accent); }
-
+ 
 .conf-hero {
   padding: 4rem 8vw 3rem;
   background:
     radial-gradient(900px 500px at 85% -20%, rgba(255,122,47,0.16), transparent 60%),
     var(--bg);
 }
-
+ 
 .conf-hero h1 {
   font-family: var(--font-display);
   font-weight: 900;
@@ -834,14 +679,14 @@ h3 {
   margin: 0.3rem 0 0;
   letter-spacing: -0.02em;
 }
-
+ 
 .conf-section {
   max-width: var(--maxw);
   margin: 0 auto;
   padding: 3rem 1.5rem;
   border-bottom: 1px solid var(--line);
 }
-
+ 
 .conf-placeholder {
   background: var(--bg-soft);
   border: 1px dashed var(--line);
@@ -864,7 +709,7 @@ h3 {
   white-space: nowrap;
 }
 .conf-meta-btn:hover { color: var(--ink); border-color: var(--ink-soft); }
-
+ 
 .annot-label {
   font-family: var(--font-body);
   font-size: 0.88rem;
@@ -889,7 +734,7 @@ h3 {
 .annot-input::-webkit-inner-spin-button,
 .annot-input::-webkit-outer-spin-button { -webkit-appearance: none; }
 .annot-input:focus { border-color: var(--accent); }
-
+ 
 #team-search {
   background: var(--bg-soft);
   border: 1px solid var(--line);
@@ -904,7 +749,7 @@ h3 {
 }
 #team-search::placeholder { color: var(--ink-soft); }
 #team-search:focus { border-color: var(--accent); }
-
+ 
 .team-annotation {
   fill: var(--ink-soft);
   font-family: var(--font-body);
@@ -912,7 +757,7 @@ h3 {
   font-weight: 600;
   pointer-events: none;
 }
-
+ 
 /* ---------- SHOT CHART ---------- */
 .court-wrap {
   display: flex;
@@ -922,7 +767,7 @@ h3 {
   margin-bottom: 1.4rem;
   width: 100%;
 }
-
+ 
 .court-svg {
   border-radius: 10px;
   cursor: crosshair;
@@ -930,13 +775,13 @@ h3 {
   max-width: 100%;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
 }
-
+ 
 .court-legend {
   display: flex;
   align-items: center;
   gap: 0.6rem;
 }
-
+ 
 .court-legend-bar {
   width: 120px;
   height: 8px;
@@ -944,16 +789,308 @@ h3 {
   background: linear-gradient(to right, #d73027, #fc8d59, #fee08b, #d9ef8b, #91cf60, #1a9850);
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
 }
-
+ 
 .court-legend-label {
   font-size: 0.72rem;
   color: var(--ink-soft);
   font-variant-numeric: tabular-nums;
 }
-
+ 
 .court-legend-note {
   font-size: 0.68rem;
   color: var(--ink-soft);
   opacity: 0.55;
   margin-left: 0.2rem;
+}
+ 
+/* ============================================================
+   STORYTELLING
+   ============================================================ */
+ 
+/* ---- scrolly layout: sticky chart + scrolling steps --------------------
+   minmax(0, ...) on the columns and min-width:0 on the children is the
+   critical part. without it, the chart SVG's intrinsic width becomes the
+   column's minimum, which blows out the track and crushes the text column
+   into a sliver (the "hamburger" bug). */
+.scrolly {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.9fr) minmax(280px, 0.9fr);
+  gap: 2.5rem;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  align-items: start;
+}
+ 
+.scrolly-graphic,
+.scrolly-steps {
+  min-width: 0;   /* allow both columns to shrink below content width */
+}
+ 
+.scrolly-steps {
+  display: flex;
+  flex-direction: column;
+}
+ 
+/* each step takes most of a screen so the chart has time to react */
+.story-step {
+  min-height: 85vh;
+  display: flex;
+  align-items: center;
+}
+ 
+.story-step p {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  line-height: 1.65;
+  background: rgba(20, 22, 28, 0.72);
+  border-left: 3px solid var(--accent-2);
+  padding: 1.4rem 1.6rem;
+  border-radius: 8px;
+  backdrop-filter: blur(4px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  opacity: 0.45;
+  transform: translateY(8px);
+}
+ 
+.story-step.is-active p {
+  opacity: 1;
+  transform: translateY(0);
+}
+ 
+.story-step strong { color: var(--accent-2); font-weight: 600; }
+.story-step em { color: var(--ink); font-style: italic; }
+ 
+/* ---- dot states driven by the story ----------------------------------- */
+.dot.story-dim {
+  opacity: 0.08 !important;
+}
+ 
+.dot.story-hi {
+  stroke: #fff !important;
+  stroke-width: 1.5px !important;
+}
+ 
+/* story callout labels on the chart */
+.story-annotation {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  fill: #fff;
+  paint-order: stroke;
+  stroke: rgba(0, 0, 0, 0.85);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+ 
+/* ---- free-exploration zone --------------------------------------------- */
+.explore-zone {
+  max-width: 1100px;
+  margin: 2rem auto 0;
+  padding: 0 1.5rem;
+}
+ 
+/* ---- takeaway ----------------------------------------------------------- */
+.takeaway {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 4rem;
+  padding-top: 2.5rem;
+}
+ 
+.takeaway-lead {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--accent-2);
+  margin-bottom: 1.5rem;
+}
+ 
+/* ---- mobile / narrow: stack chart on top, steps below ------------------ */
+@media (max-width: 820px) {
+  .scrolly {
+    grid-template-columns: 1fr;
+  }
+  .scrolly-graphic {
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    padding: 0.75rem 0;
+    z-index: 5;
+  }
+  .story-step {
+    min-height: 70vh;
+  }
+  .story-step p {
+    font-size: 1.05rem;
+  }
+}
+
+.scrolly-graphic {
+  position: sticky;
+  top: 1.5rem;
+  align-self: start;
+  height: calc(100vh - 3rem);
+  display: flex;
+  flex-direction: column;
+}
+ 
+/* hide ONLY the interactive controls, and ONLY during the story.
+   the legend (including the color caption) stays put. */
+body.story-mode .scrolly-graphic .conf-filter,
+body.story-mode .scrolly-graphic .conf-footnote {
+  display: none;
+}
+ 
+/* compact legend, but KEEP the color caption visible at all times */
+.scrolly-graphic .net-legend { margin: 0 0 0.5rem; }
+.scrolly-graphic .net-legend-link { display: none; }   /* drop only the link */
+.scrolly-graphic .net-legend-note {
+  display: block;                /* keep the "colored by NET" caption */
+  font-size: 0.78rem;
+  margin-bottom: 0.2rem;
+}
+.scrolly-graphic .net-bin-legend { margin-top: 0.35rem; }
+.scrolly-graphic .net-bin {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+  padding: 0.28rem 0.5rem;
+}
+.scrolly-graphic .net-bin-swatch { width: 18px; height: 8px; }
+.scrolly-graphic .net-bin-range { display: none; }
+ 
+.scrolly-graphic .viz-header { margin-bottom: 0.5rem; }
+.scrolly-graphic .viz-header-text h2 { font-size: 1.5rem; margin-bottom: 0.3rem; }
+.scrolly-graphic .viz-caption { margin-bottom: 0.4rem; font-size: 0.85rem; }
+ 
+/* chart fills all remaining height */
+.scrolly-graphic #chart {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  padding: 0.5rem;
+}
+.scrolly-graphic #chart svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.scrolly {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.9fr) minmax(280px, 0.9fr);
+  gap: 2.5rem;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  align-items: start;
+}
+ 
+.scrolly-graphic,
+.scrolly-steps { min-width: 0; }
+ 
+/* chart is sticky and viewport-tall at ALL times — never changes size */
+.scrolly-graphic {
+  position: sticky;
+  top: 1.5rem;
+  align-self: start;
+  height: calc(100vh - 3rem);
+  display: flex;
+  flex-direction: column;
+}
+ 
+.scrolly-steps { display: flex; flex-direction: column; }
+ 
+.story-step {
+  min-height: 85vh;
+  display: flex;
+  align-items: center;
+}
+ 
+/* controls: hidden only during the story, return at the end. Because the
+   chart fills leftover flex space, showing the controls costs only the
+   control row's height. To keep the chart from shrinking at all, the
+   controls are absolutely positioned at the bottom of the graphic so they
+   overlay rather than push — see below. */
+body.story-mode .scrolly-graphic .conf-filter,
+body.story-mode .scrolly-graphic .conf-footnote {
+  display: none;
+}
+ 
+/* chart fills all remaining height, identical in both states */
+.scrolly-graphic #chart {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  padding: 0.5rem;
+}
+.scrolly-graphic #chart svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+ 
+/* after the story, the controls appear in a compact row ABOVE the chart
+   (in the header zone), where the height was already reserved by the
+   legend — so the chart's flex space barely changes */
+/* after story: controls overlay the top of the chart card instead of
+   stacking above it, so they take ZERO height from the chart */
+body:not(.story-mode) .scrolly-graphic {
+  position: sticky;          /* keep as-is */
+}
+
+body:not(.story-mode) .scrolly-graphic #chart {
+  position: relative;        /* anchor for the absolute controls */
+}
+
+body:not(.story-mode) .scrolly-graphic .conf-filter {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  right: 0.6rem;
+  z-index: 15;
+  margin: 0;
+  gap: 0.4rem;
+  background: rgba(14, 17, 22, 0.85);
+  backdrop-filter: blur(6px);
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+}
+body:not(.story-mode) .scrolly-graphic .conf-footnote {
+  display: none;            /* drop the footnote to save height; link is in legend area */
+}
+
+body:not(.story-mode) .scrolly-graphic .conf-menu {
+  position: absolute;
+  z-index: 20;
+}
+ 
+/* compact legend always, so header height is constant */
+.scrolly-graphic .net-bin-range { display: none; }
+.scrolly-graphic .net-legend-link { display: none; }
+.scrolly-graphic .net-legend-note { display: block; font-size: 0.78rem; }
+.scrolly-graphic .net-bin {
+  flex-direction: row; align-items: center; gap: 0.4rem;
+  min-width: 0; padding: 0.28rem 0.5rem;
+}
+.scrolly-graphic .net-bin-swatch { width: 18px; height: 8px; }
+.scrolly-graphic .viz-header { margin-bottom: 0.5rem; }
+.scrolly-graphic .viz-header-text h2 { font-size: 1.5rem; margin-bottom: 0.3rem; }
+.scrolly-graphic .viz-caption { margin-bottom: 0.4rem; font-size: 0.85rem; }
+
+/* after story: hide the redundant title + caption only.
+   the controls already sit above the chart, so this just frees the space
+   they were overlapping with. Do NOT reposition the controls. */
+body:not(.story-mode) .scrolly-graphic .viz-header-text {
+  display: none;
+}
+
+/* after story: hide the dot color legend as well (reader has context) */
+body:not(.story-mode) .scrolly-graphic .net-legend {
+  display: none;
 }

@@ -16,8 +16,10 @@
       <h1>Shot Quality <span class="accent">vs.</span><br />Shot Volume</h1>
       <p class="hero-sub">An Interactive Exploration of College Basketball Offenses</p>
       <p class="dek">
-        Do the best college basketball offenses shoot <em>more</em>,
-        or shoot <em>better</em>? Scroll to find out.
+        Every team in the country wants a better offense. The analytics era
+        gave them a simple instruction: <em>shoot more</em> rim attempts and threes.
+        So here is the uncomfortable question this page answers&mdash;does shooting
+        more of the right shots actually make you good?
       </p>
       <p class="byline">
         <span class="byline-label">By</span>
@@ -28,110 +30,220 @@
   </header>
 
   <main>
-    <section class="prose">
-      <p>
-        Every possession ends in a choice: where to shoot from. Some teams
-        crank up the volume, firing away at every opportunity. Others are
-        patient, hunting only for high-value looks. This is an exploration
-        of that tension, across hundreds of Division I teams.
-      </p>
-    </section>
+    <!-- ====================================================================
+         SCROLLYTELLING SECTION
+         The chart is sticky on the right (or top, on mobile); the text steps
+         scroll past it on the left. Each .story-step has a data-step index
+         that main.js reads to drive applyStoryStep().
+         ==================================================================== -->
+    <section class="scrolly">
+      <!-- sticky graphic: the chart lives here for the whole story -->
+      <div class="scrolly-graphic">
+        <div class="viz-header">
+          <div class="viz-header-text">
+            <h2>Shot Quality vs. Shot Volume</h2>
+            <p class="viz-caption">
+              Each dot is a Division&nbsp;I team. Horizontal is how often they shoot
+              rim attempts and threes; vertical is how well they shoot them.
+              Dashed lines mark the league median.
+            </p>
+          </div>
 
-    <section class="viz-section">
-      <div class="viz-header">
-        <div class="viz-header-text">
-          <h2>Shot Quality vs. Shot Volume</h2>
-          <p class="viz-caption">
-            Each dot is a team. Hover to see who. The dashed lines mark the median in each direction.
+          <div class="net-legend">
+            <div class="net-legend-head">
+              <span class="net-legend-title">Dot Color Legend</span>
+              <span class="net-legend-note">Dots are colored by NET Ranking. Green means stronger, red means weaker.</span>
+              <a class="net-legend-link" href="https://www.ncaa.com/news/basketball-men/article/2022-12-05/college-basketballs-net-rankings-explained" target="_blank" rel="noopener noreferrer">For more information on NET rankings &rarr;</a>
+            </div>
+            <div class="net-bin-legend" aria-label="NET ranking color bins">
+              <div class="net-bin" style="--bin-color:#1a9850">
+                <span class="net-bin-swatch"></span>
+                <span class="net-bin-label">Best</span>
+                <span class="net-bin-range">#1-73</span>
+              </div>
+              <div class="net-bin" style="--bin-color:#91cf60">
+                <span class="net-bin-swatch"></span>
+                <span class="net-bin-label">Strong</span>
+                <span class="net-bin-range">#74-146</span>
+              </div>
+              <div class="net-bin" style="--bin-color:#d9ef8b">
+                <span class="net-bin-swatch"></span>
+                <span class="net-bin-label">Solid</span>
+                <span class="net-bin-range">#147-219</span>
+              </div>
+              <div class="net-bin" style="--bin-color:#fc8d59">
+                <span class="net-bin-swatch"></span>
+                <span class="net-bin-label">Weak</span>
+                <span class="net-bin-range">#220-292</span>
+              </div>
+              <div class="net-bin" style="--bin-color:#d73027">
+                <span class="net-bin-swatch"></span>
+                <span class="net-bin-label">Worst</span>
+                <span class="net-bin-range">#293-365</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- controls live with the chart but stay hidden until the story ends -->
+        <div class="conf-filter">
+          <div id="conf-dropdown" class="conf-dropdown">
+            <button id="conf-button" class="conf-button" type="button">
+              Filter by conference
+              <span class="conf-caret">&#9662;</span>
+            </button>
+            <div id="conf-menu" class="conf-menu"></div>
+          </div>
+          <label class="annot-label" for="annot-limit">Label top</label>
+          <input type="number" id="annot-limit" class="annot-input" min="0" max="365" placeholder="—" />
+          <span class="annot-label">teams</span>
+          <label class="annot-label" for="annot-bottom-limit">bottom</label>
+          <input type="number" id="annot-bottom-limit" class="annot-input" min="0" max="365" placeholder="—" />
+          <span class="annot-label">teams</span>
+          <button id="conf-major" class="conf-meta-btn" type="button">Power 5</button>
+          <button id="conf-clear" class="conf-clear" type="button">Clear</button>
+          <span id="conf-status" class="conf-status"></span>
+          <input type="text" id="team-search" placeholder="Search team…" autocomplete="off" spellcheck="false" />
+        </div>
+
+        <p class="conf-footnote">
+          Conferences are listed in order of their
+          <a href="https://barttorvik.com/?year=2026&amp;sort=&amp;hteam=&amp;t2value=&amp;conlimit=All&amp;state=All&amp;conyes=1&amp;begin=20251101&amp;end=20260501&amp;top=0&amp;revquad=0&amp;quad=5&amp;venue=All&amp;type=All&amp;mingames=0" target="_blank" rel="noopener noreferrer">Bart Torvik conference rankings</a>.
+        </p>
+
+        <div id="chart"></div>
+        <div id="tooltip" class="tooltip" role="status"></div>
+      </div>
+
+      <!-- scrolling text steps -->
+      <div class="scrolly-steps">
+        <div class="story-step" data-step="0">
+          <p>
+            This is every Division&nbsp;I men's team this season, placed by how
+            <strong>much</strong> they shoot the league's two most efficient shots
+            (rim attempts and three-pointers) and how <strong>well</strong> they
+            shoot them. Color is overall team strength: green is elite, red is not.
+            Notice the green clusters near the top. Let's find out why.
           </p>
         </div>
 
-        <div class="net-legend">
-          <div class="net-legend-head">
-            <span class="net-legend-title">Dot Color Legend</span>
-            <span class="net-legend-note">Dots are colored by NET Ranking. Green means stronger, red means weaker.</span>
-            <a class="net-legend-link" href="https://www.ncaa.com/news/basketball-men/article/2022-12-05/college-basketballs-net-rankings-explained" target="_blank" rel="noopener noreferrer">For more information on NET rankings &rarr;</a>
-          </div>
-          <div class="net-bin-legend" aria-label="NET ranking color bins">
-            <div class="net-bin" style="--bin-color:#1a9850">
-              <span class="net-bin-swatch"></span>
-              <span class="net-bin-label">Best</span>
-              <span class="net-bin-range">#1-73</span>
-            </div>
-            <div class="net-bin" style="--bin-color:#91cf60">
-              <span class="net-bin-swatch"></span>
-              <span class="net-bin-label">Strong</span>
-              <span class="net-bin-range">#74-146</span>
-            </div>
-            <div class="net-bin" style="--bin-color:#d9ef8b">
-              <span class="net-bin-swatch"></span>
-              <span class="net-bin-label">Solid</span>
-              <span class="net-bin-range">#147-219</span>
-            </div>
-            <div class="net-bin" style="--bin-color:#fc8d59">
-              <span class="net-bin-swatch"></span>
-              <span class="net-bin-label">Weak</span>
-              <span class="net-bin-range">#220-292</span>
-            </div>
-            <div class="net-bin" style="--bin-color:#d73027">
-              <span class="net-bin-swatch"></span>
-              <span class="net-bin-label">Worst</span>
-              <span class="net-bin-range">#293-365</span>
-            </div>
-          </div>
+        <div class="story-step" data-step="1">
+          <p>
+            Start with the obvious winners. <strong>Michigan, Duke, and Florida</strong>
+            sit in the top-right: they shoot a lot of good shots <em>and</em> make them.
+            It would be easy to conclude that the recipe is simply "shoot more of the
+            right shots." Hold that thought.
+          </p>
         </div>
-      </div>
-      
-      <div class="conf-filter">
-        <div id="conf-dropdown" class="conf-dropdown">
-          <button id="conf-button" class="conf-button" type="button">
-            Filter by conference
-            <span class="conf-caret">&#9662;</span>
-          </button>
-          <div id="conf-menu" class="conf-menu"></div>
+
+        <div class="story-step" data-step="2">
+          <p>
+            If volume were the secret, the entire right half of the chart&mdash;every
+            high-volume team&mdash;should be winning. So look at all of them at once.
+            Some are green. But a lot of them are orange and red. Volume alone is
+            clearly not sorting the good teams from the bad.
+          </p>
         </div>
-        <label class="annot-label" for="annot-limit">Label top</label>
-        <input type="number" id="annot-limit" class="annot-input" min="0" max="365" placeholder="—" />
-        <span class="annot-label">teams</span>
-        <label class="annot-label" for="annot-bottom-limit">bottom</label>
-        <input type="number" id="annot-bottom-limit" class="annot-input" min="0" max="365" placeholder="—" />
-        <span class="annot-label">teams</span>
-        <button id="conf-major" class="conf-meta-btn" type="button">Power 5</button>
-        <button id="conf-clear" class="conf-clear" type="button">Clear</button>
-        <span id="conf-status" class="conf-status"></span>
-        <input type="text" id="team-search" placeholder="Search team…" autocomplete="off" spellcheck="false" />
-      </div>
 
-      <p class="conf-footnote">
-        Conferences are listed in order of their
-        <a href="https://barttorvik.com/?year=2026&amp;sort=&amp;hteam=&amp;t2value=&amp;conlimit=All&amp;state=All&amp;conyes=1&amp;begin=20251101&amp;end=20260501&amp;top=0&amp;revquad=0&amp;quad=5&amp;venue=All&amp;type=All&amp;mingames=0" target="_blank" rel="noopener noreferrer">Bart Torvik conference rankings</a>.
-      </p>
+        <div class="story-step" data-step="3">
+          <p>
+            Here is the problem with the volume theory. <strong>Cal Poly, Elon, and
+            Youngstown State</strong> shoot rim-and-threes as often as almost anyone in
+            the country. They are among the highest-volume teams here. And they sit at
+            <strong>NET #219, #222, and #227</strong>. Shooting more did not save them,
+            because they shoot it <em>badly</em>.
+          </p>
+        </div>
 
-      <div id="chart"></div>
+        <div class="story-step" data-step="4">
+          <p>
+            Now the opposite case. <strong>Houston, Arizona, Purdue, and Michigan State</strong>
+            are <em>below</em> the median in volume. They don't crank up shots. Yet they
+            sit at <strong>NET #6, #3, #8, and #11</strong>&mdash;genuinely elite. They win
+            not by shooting more, but by only taking shots they make.
+          </p>
+        </div>
 
-      <div id="tooltip" class="tooltip" role="status"></div>
+        <div class="story-step" data-step="5">
+          <p>
+            And this is the punchline. Dim the entire bottom half&mdash;every
+            low-quality team&mdash;and watch what disappears: <strong>all of the green.</strong>
+            Across all 365 teams, <strong>every single top-25 team is above-median in shot
+            quality.</strong> Only 15 of those 25 are above-median in volume. Quality is
+            the price of admission. Volume is optional.
+          </p>
+        </div>
 
-      <div id="team-panel" class="team-panel">
-        <p class="team-panel-hint">Click any team's dot to see its full shot profile.</p>
+        <div class="story-step" data-step="6">
+          <p>
+            So the answer to our question: the best offenses don't shoot
+            <em>more</em>&mdash;they shoot <em>better</em>. Now the chart is yours.
+            To cut through the crowding, we've highlighted the <strong>top 10</strong>
+            and <strong>bottom 10</strong> teams by default&mdash;but explore however you
+            like. Hit <em>Clear</em> to see all 365 at once, filter by conference, search
+            your team, click any dot for its full shot profile, or drag a box to compare
+            a group.
+          </p>
+        </div>
+        </div>
       </div>
     </section>
 
+    <!-- ====================================================================
+         FREE-EXPLORATION ZONE
+         The team / group panel renders here after a click or brush. This sits
+         below the scrolly so it doesn't fight the sticky chart.
+         ==================================================================== -->
+    <section class="explore-zone">
+      <div id="team-panel" class="team-panel">
+        <p class="team-panel-hint">Click any team's dot above to see its full shot profile.</p>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         TAKEAWAY  (replaces the old prototype writeup)
+         ==================================================================== -->
+    <section class="prose takeaway">
+      <h2>The one thing to take away</h2>
+      <p class="takeaway-lead">
+        You cannot shoot your way to a good offense by volume alone. Quality is the
+        requirement; volume is a style choice on top of it.
+      </p>
+      <p>
+        The clearest proof is in the two corners people overlook. The selective,
+        low-volume teams (Houston, Arizona, Purdue) win <strong>roughly nine
+        percentage points more often</strong> than the high-volume, low-quality teams
+        (Cal Poly, Elon, Youngstown State), despite taking fewer of the "good" shots.
+        When volume and quality disagree, quality wins, every time. That is why the
+        entire bottom of this chart is locked out of the rankings no matter how much
+        those teams shoot.
+      </p>
+      <p>
+        This visualization makes that visible in a way a table of correlations cannot:
+        you can <em>watch</em> the green vanish the moment low-quality teams are removed,
+        and you can see for yourself that no amount of horizontal movement (volume)
+        rescues a team that is low on the vertical axis (quality).
+      </p>
+    </section>
+
+        <!-- TEMPORARY: prototype writeup for grading checkoff. Remove after graded. -->
     <section class="prose writeup">
-      <h2>Project Writeup</h2>
+      <h2>Project Writeup - TEMPORARY - REMOVE LATER</h2>
       <h3>What have you done so far?</h3>
       <p>
-        So far, we've initialized the first version of our core visualization, plotting Shot Volume (x) against Shot Quality (y). Both axes focus on Rim Attempts and 3-Pointers, widely considered the most efficient shots in basketball. 
-        Shot Volume is the number of these attempts per game, and Shot Quality is the eFG% on them. We also added a conference filter, allowing the viewer to select only certain conferences (ordered in the dropdown menu by conference rank). You can also click on any 
-        individual dot (which are colored by their net rating) to see a more in depth profile on each team's shooting profile (in depth shot quality, shot volume and additional shot diet data). We also have a brush tool allowing you to highlight regions of the chart 
+        So far, we've initialized the first version of our core visualization, plotting Shot Volume (x) against Shot Quality (y). Both axes focus on Rim Attempts and 3-Pointers, widely considered the most efficient shots in basketball.
+        Shot Volume is the number of these attempts per game, and Shot Quality is the eFG% on them. We also added a conference filter, allowing the viewer to select only certain conferences (ordered in the dropdown menu by conference rank). You can also click on any
+        individual dot (which are colored by their net rating) to see a more in depth profile on each team's shooting profile (in depth shot quality, shot volume and additional shot diet data). We also have a brush tool allowing you to highlight regions of the chart
         and will show these same additional stats aggregated for all highlighted teams. Lastly, we're working on building out individual pages for each conference but we haven't set up all conferences or added much content to those that we have created.
       </p>
       <h3>What will be the most challenging part to design, and why?</h3>
       <p>
-        The most challenging aspect of our project will be the temporal aspect we hope to add. We'd like to add shot data for the last 5-10 seasons, to show how shooting trends have changed overall within college basketball, especially within winning teams. Another 
-        challenge we expect to face is making the project easily digestible for viewers who may not be familiar with college basketball at all (for example what do all of these statistics and numbers mean). For this we plan to add a large section dedicated to introducing 
-        viewers to the concepts we dive more heavily into. We're waiting to add this until we build out more of the project, so we know what stats, terms, and concepts are most important to contextualize. 
+        The most challenging aspect of our project will be the temporal aspect we hope to add. We'd like to add shot data for the last 5-10 seasons, to show how shooting trends have changed overall within college basketball, especially within winning teams. Another
+        challenge we expect to face is making the project easily digestible for viewers who may not be familiar with college basketball at all (for example what do all of these statistics and numbers mean). For this we plan to add a large section dedicated to introducing
+        viewers to the concepts we dive more heavily into. We're waiting to add this until we build out more of the project, so we know what stats, terms, and concepts are most important to contextualize.
       </p>
     </section>
+
   </main>
 
   <footer class="site-footer">
@@ -139,6 +251,7 @@
   </footer>
 
   <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://unpkg.com/scrollama"></script>
   <script src="main.js"></script>
 </body>
 </html>
