@@ -865,6 +865,7 @@ h3 {
 /* ---- dot states driven by the story ----------------------------------- */
 .dot.story-dim {
   opacity: 0.08 !important;
+  pointer-events: none;
 }
  
 .dot.story-hi {

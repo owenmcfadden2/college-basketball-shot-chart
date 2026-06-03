@@ -193,6 +193,11 @@ function updateDots() {
         return d.teamMarket.toLowerCase().includes(searchTerm.toLowerCase()) ? 1 : 0.1;
       return 1;
     })
+    .style("pointer-events", (d) => {
+      if (searchTerm.length >= 2)
+        return d.teamMarket.toLowerCase().includes(searchTerm.toLowerCase()) ? null : "none";
+      return null;
+    })
     .classed("dimmed", (d) => {
       if (searchTerm.length >= 2) return false;
       const confDim = selectedConferences.size > 0 && !selectedConferences.has(d.conferenceId);
