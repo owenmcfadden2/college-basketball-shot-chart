@@ -49,6 +49,7 @@ const POWER_5 = new Set([73, 89, 60, 53, 29]);
 let allData = [];
 const selectedConferences = new Set();
 let selectedTeamId = null;
+let compareTeamId = null;
 let searchTerm = "";
 let annotationLimit = 0;
 let annotationBottomLimit = 0;
@@ -70,6 +71,13 @@ d3.csv("data/shot_data.csv", d3.autoType).then((raw) => {
   buildConferenceDropdown();
   buildMetaButtons();
   updateDots();
+  const teamList = document.getElementById("compare-team-list");
+  allData.slice().sort((a, b) => a.teamMarket.localeCompare(b.teamMarket))
+    .forEach((d) => {
+      const opt = document.createElement("option");
+      opt.value = d.teamMarket;
+      teamList.appendChild(opt);
+    });
 });
  
 function buildChartShell() {
@@ -224,6 +232,13 @@ function updateDots() {
     svg.selectAll(".dot")
       .filter((d) => d.teamId === selectedTeamId)
       .classed("selected", true).attr("r", 7.5);
+  }
+
+  svg.selectAll(".dot").classed("compare-selected", false);
+  if (compareTeamId != null) {
+    svg.selectAll(".dot")
+      .filter((d) => d.teamId === compareTeamId)
+      .classed("compare-selected", true).attr("r", 7.5);
   }
  
   updateFilterStatus(filtered.length);
@@ -389,6 +404,25 @@ function showTeamPanel(d) {
     effCell.append("span").attr("class", "tp-pct-chip")
       .style("background", pctColor(d[z.effPct])).text(`${pctLabel(d[z.effPct])}`);
   });
+
+  const compareWidget = panel.append("div").attr("class", "tp-compare-widget");
+  compareWidget.append("p").attr("class", "tp-compare-widget-label").text("Compare with another team");
+  const compareInput = compareWidget.append("input")
+    .attr("type", "text")
+    .attr("class", "tp-compare-input")
+    .attr("placeholder", "Type a team name…")
+    .attr("list", "compare-team-list")
+    .attr("autocomplete", "off")
+    .attr("spellcheck", "false");
+  compareInput.on("input", function () {
+    const val = this.value.trim();
+    if (!val) { compareTeamId = null; updateDots(); return; }
+    const match = allData.find((dd) => dd.teamMarket.toLowerCase() === val.toLowerCase());
+    if (!match || match.teamId === d.teamId) return;
+    compareTeamId = match.teamId;
+    updateDots();
+    showComparePanel(d, match);
+  });
  
   document.getElementById("team-panel").scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
@@ -399,7 +433,74 @@ function closeTeamPanel() {
   panel.classed("active", false);
   panel.html('<p class="team-panel-hint">Click any team\'s dot to see its full shot profile.</p>');
   selectedTeamId = null;
-  svg.selectAll(".dot").classed("selected", false).attr("r", 5.5);
+  compareTeamId = null;
+  svg.selectAll(".dot").classed("selected", false).classed("compare-selected", false).attr("r", 5.5);
+}
+
+function showComparePanel(d1, d2) {
+  document.body.classList.add("panel-open");
+  const panel = d3.select("#team-panel");
+  panel.classed("active", true);
+  panel.html("");
+
+  const header = panel.append("div").attr("class", "tp-header");
+  const titleWrap = header.append("div");
+  titleWrap.append("h3").attr("class", "tp-name")
+    .html(`${d1.teamMarket} <span class="tp-vs">vs.</span> ${d2.teamMarket}`);
+  const losses1 = d1["GP*"] - d1.Wins;
+  const losses2 = d2["GP*"] - d2.Wins;
+  titleWrap.append("p").attr("class", "tp-sub")
+    .text(`${d1.teamMarket}: NET #${d1[NET_COL]} · ${d1.Wins}-${losses1}    ·    ${d2.teamMarket}: NET #${d2[NET_COL]} · ${d2.Wins}-${losses2}`);
+  header.append("button").attr("class", "tp-close").attr("type", "button")
+    .html("&times;").on("click", closeTeamPanel);
+
+  panel.append("h4").attr("class", "tp-section-title").text("Shot charts");
+  const courts = panel.append("div").attr("class", "tp-compare-courts");
+  [d1, d2].forEach((d) => {
+    const side = courts.append("div").attr("class", "tp-compare-side");
+    side.append("p").attr("class", "tp-compare-name").text(d.teamMarket);
+    side.node().appendChild(buildCourtChart(d));
+  });
+
+  panel.append("h4").attr("class", "tp-section-title").text("Zone efficiency head-to-head");
+  const table = panel.append("div").attr("class", "tp-zones tp-zones-compare");
+  const head = table.append("div").attr("class", "tp-zone-row tp-zone-head");
+  head.append("span").text("Zone");
+  head.append("span").text(d1.teamMarket);
+  head.append("span").text(d2.teamMarket);
+
+  ZONES.forEach((z) => {
+    const row = table.append("div").attr("class", "tp-zone-row");
+    row.append("span").attr("class", "tp-zone-label").text(z.label);
+    [d1, d2].forEach((d) => {
+      const cell = row.append("span").attr("class", "tp-zone-cell");
+      cell.append("span").attr("class", "tp-val").text(`${(d[z.eff] * 100).toFixed(1)}%`);
+      cell.append("span").attr("class", "tp-pct-chip")
+        .style("background", pctColor(d[z.effPct])).text(pctLabel(d[z.effPct]));
+    });
+  });
+
+  const changeWidget = panel.append("div").attr("class", "tp-compare-widget");
+  changeWidget.append("p").attr("class", "tp-compare-widget-label").text("Change comparison team");
+  const changeInput = changeWidget.append("input")
+    .attr("type", "text")
+    .attr("class", "tp-compare-input")
+    .attr("placeholder", "Type a team name…")
+    .attr("list", "compare-team-list")
+    .attr("autocomplete", "off")
+    .attr("spellcheck", "false")
+    .property("value", d2.teamMarket);
+  changeInput.on("input", function () {
+    const val = this.value.trim();
+    if (!val) { compareTeamId = null; updateDots(); showTeamPanel(d1); return; }
+    const match = allData.find((dd) => dd.teamMarket.toLowerCase() === val.toLowerCase());
+    if (!match || match.teamId === d1.teamId) return;
+    compareTeamId = match.teamId;
+    updateDots();
+    showComparePanel(d1, match);
+  });
+
+  document.getElementById("team-panel").scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
  
 function showEmptyBrush() {
@@ -725,7 +826,7 @@ function buildCourtChart(vals) {
 // Teams the story spotlights, by exact teamMarket string.
 const STORY_TEAMS = {
   elite:    ["Michigan", "Duke", "Florida"],                 // TR: have both
-  selective:["Houston", "Arizona", "Purdue", "Michigan St."],// TL: low vol, high qual
+  selective:["Houston", "Arizona", "Purdue"],                //TL: low vol, high qual
   wasteful: ["Cal Poly", "Elon", "Youngstown St."],          // BR: high vol, low qual
 };
  
@@ -770,15 +871,15 @@ function storyLabel(d, text, dy) {
  
 function applyStoryStep(step) {
   storyActive = true;
-  document.body.classList.add("story-mode");   // <-- hides controls via CSS
+  document.body.classList.add("story-mode");   // hides controls via CSS
   resetStoryDots();
   const med = storyMedians();
   const dots = svg.selectAll(".dot");
- 
+
   switch (step) {
     case 0:
       break;
- 
+
     case 1:
       dots.classed("story-dim", (d) => !inList(d, STORY_TEAMS.elite));
       dots.filter((d) => inList(d, STORY_TEAMS.elite))
@@ -786,11 +887,11 @@ function applyStoryStep(step) {
       svg.selectAll(".dot").filter((d) => inList(d, STORY_TEAMS.elite))
         .each(function (d) { storyLabel(d, d.teamMarket, -10); });
       break;
- 
+
     case 2:
       dots.classed("story-dim", (d) => d[X_COL] < med.x);
       break;
- 
+
     case 3:
       dots.classed("story-dim", (d) => !inList(d, STORY_TEAMS.wasteful));
       dots.filter((d) => inList(d, STORY_TEAMS.wasteful))
@@ -798,7 +899,7 @@ function applyStoryStep(step) {
       svg.selectAll(".dot").filter((d) => inList(d, STORY_TEAMS.wasteful))
         .each(function (d) { storyLabel(d, `${d.teamMarket} · NET #${d[NET_COL]}`, -10); });
       break;
- 
+
     case 4:
       dots.classed("story-dim", (d) => !inList(d, STORY_TEAMS.selective));
       dots.filter((d) => inList(d, STORY_TEAMS.selective))
@@ -806,14 +907,10 @@ function applyStoryStep(step) {
       svg.selectAll(".dot").filter((d) => inList(d, STORY_TEAMS.selective))
         .each(function (d) { storyLabel(d, `${d.teamMarket} · NET #${d[NET_COL]}`, -10); });
       break;
- 
+
     case 5:
+      // final step: dim everyone below median quality (the punchline)
       dots.classed("story-dim", (d) => d[Y_COL] < med.y);
-      break;
- 
-      case 6:
-      // story stays as-is; exploration now lives on explore.html
-      storyActive = true;
       break;
   }
 }

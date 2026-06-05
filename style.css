@@ -36,7 +36,7 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  padding: 0 8vw;
+  padding: 4rem 8vw 0;
   position: relative;
   background:
     radial-gradient(1200px 600px at 80% -10%, rgba(255,122,47,0.18), transparent 60%),
@@ -189,6 +189,7 @@ h3 {
 .dot:hover { stroke: var(--ink); stroke-width: 1.5px; }
 .dot.dim { opacity: 0.12; }
 .dot.dimmed { opacity: 0.15; filter: blur(1.5px); pointer-events: none; }
+.dot.compare-selected { stroke: var(--accent-2) !important; stroke-width: 2px !important; }
  
 /* ---------- VIZ HEADER (two-column) ---------- */
 .viz-header {
@@ -483,6 +484,11 @@ h3 {
 }
  
 .byline a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+.byline-top {
+  margin-top: 0.4rem;
+  margin-bottom: 0;
+}
  
 /* ---------- SELECTED DOT ---------- */
 .dot.selected {
@@ -1296,3 +1302,59 @@ body:not(.story-mode) .scrolly-graphic .net-legend {
 .proof-tip-name { font-weight: 700; }
 .proof-tip-row { color: #444; }
 .proof-tip-row strong { color: #111; font-weight: 700; }
+
+/* ---------- COMPARE WIDGET ---------- */
+.tp-compare-widget {
+  margin-top: 1.8rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--line);
+}
+.tp-compare-widget-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-soft);
+  margin: 0 0 0.6rem;
+}
+.tp-compare-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  padding: 0.55rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.tp-compare-input::placeholder { color: var(--ink-soft); }
+.tp-compare-input:focus { border-color: var(--accent-2); }
+
+.tp-vs {
+  font-family: var(--font-body);
+  font-size: 0.7em;
+  font-weight: 400;
+  color: var(--ink-soft);
+  margin: 0 0.4rem;
+}
+.tp-compare-courts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+.tp-compare-side .court-wrap { width: 100%; }
+.tp-compare-side .court-svg { width: 100% !important; height: auto !important; }
+.tp-compare-side .court-legend { display: none; }
+.tp-compare-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  text-align: center;
+  margin: 0 0 0.4rem;
+}
+.tp-zones-compare .tp-zone-row {
+  grid-template-columns: 1.4fr 1fr 1fr;
+}

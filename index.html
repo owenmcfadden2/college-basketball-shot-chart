@@ -15,6 +15,10 @@
       <p class="eyebrow">DSC 106 &middot; Final Project</p>
       <h1>Shot Quality <span class="accent">vs.</span><br />Shot Volume</h1>
       <p class="hero-sub">An Interactive Exploration of College Basketball Offenses</p>
+      <p class="byline byline-top">
+        <span class="byline-label">By</span>
+        Owen McFadden, Madhav Pudukottai Krishnaraj, Karthik Sankaran, and Yaqub Mir
+      </p>
       <p class="dek">
         The analytics revolution gave college coaches a clear formula: attack
         the rim and shoot threes. Some programs run that play on every single
@@ -23,10 +27,6 @@
         is <em>everything.</em>
       </p>
       <a href="glossary.html" class="glossary-btn">Background &amp; Glossary &rarr;</a>
-      <p class="byline">
-        <span class="byline-label">By</span>
-        Owen McFadden, Madhav Pudukottai Krishnaraj, Karthik Sankaran, and Yaqub Mir
-      </p>
     </div>
     <div class="scroll-cue" aria-hidden="true">&darr;</div>
   </header>
@@ -111,6 +111,7 @@
           <button id="conf-clear" class="conf-clear" type="button">Clear</button>
           <span id="conf-status" class="conf-status"></span>
           <input type="text" id="team-search" placeholder="Search team…" autocomplete="off" spellcheck="false" />
+          <datalist id="compare-team-list"></datalist>
         </div>
 
         <p class="conf-footnote">
@@ -176,7 +177,7 @@
           </p>
         </div>
 
-        <div class="story-step story-step-final" data-step="6">
+      <div class="story-step story-step-final" data-step="5">
           <p>
             The best offenses are not the ones that shoot the most rim attempts and
             threes. They are the ones that <em>only</em> shoot when the defense hands
@@ -184,55 +185,46 @@
             Quality is what you have when you stop forcing it.
           </p>
         </div>
-        </div>
-      </div>
-    </section>
-
-     </section>  <!-- end of .scrolly -->
+      </div><!-- end .scrolly-steps -->
+    </section><!-- end .scrolly -->
 
     <!-- 25/25 proof graphic, full width below the story -->
     <section class="proof-section">
       <h2>The proof, counted</h2>
-        <p class="proof-intro">
-          We keep saying the best teams shoot better, not more. Here is that claim
-          made literal: the 25 best teams in the country, ranked left to right by NET.
-          Hover any square to see the team.
+      <p class="proof-intro">
+        We keep saying the best teams shoot better, not more. Here is that claim
+        made literal: the 25 best teams in the country, ranked left to right by NET.
+        Hover any square to see the team.
+      </p>
+
+      <div class="proof-2525">
+        <div class="proof-row">
+          <div class="proof-row-head">
+            <span class="proof-row-label">Above-median <strong>shot quality</strong></span>
+            <span class="proof-row-count proof-count-full">25 / 25</span>
+          </div>
+          <svg id="proof-quality-row" class="proof-squares" xmlns="http://www.w3.org/2000/svg"
+               aria-label="Top 25 teams, shot quality vs median"></svg>
+        </div>
+
+        <div class="proof-row">
+          <div class="proof-row-head">
+            <span class="proof-row-label">Above-median <strong>shot volume</strong></span>
+            <span class="proof-row-count proof-count-partial">15 / 25</span>
+          </div>
+          <svg id="proof-volume-row" class="proof-squares" xmlns="http://www.w3.org/2000/svg"
+               aria-label="Top 25 teams, shot volume vs median"></svg>
+        </div>
+
+        <p class="proof-caption">
+          Ranked left to right, #1 to #25 by NET. Each square is one team. Every one
+          shoots above-average <strong>quality</strong>. Ten shoot below-average
+          <strong>volume</strong> and are elite anyway.
         </p>
-      
-        <div class="proof-2525">
-          <div class="proof-row">
-            <div class="proof-row-head">
-              <span class="proof-row-label">Above-median <strong>shot quality</strong></span>
-              <span class="proof-row-count proof-count-full">25 / 25</span>
-            </div>
-            <svg id="proof-quality-row" class="proof-squares" xmlns="http://www.w3.org/2000/svg"
-                aria-label="Top 25 teams, shot quality vs median"></svg>
-          </div>
-      
-          <div class="proof-row">
-            <div class="proof-row-head">
-              <span class="proof-row-label">Above-median <strong>shot volume</strong></span>
-              <span class="proof-row-count proof-count-partial">15 / 25</span>
-            </div>
-            <svg id="proof-volume-row" class="proof-squares" xmlns="http://www.w3.org/2000/svg"
-                aria-label="Top 25 teams, shot volume vs median"></svg>
-          </div>
-      
-          <p class="proof-caption">
-            Ranked left to right, #1 to #25 by NET. Each square is one team. Every one
-            shoots above-average <strong>quality</strong>. Ten shoot below-average
-            <strong>volume</strong> and are elite anyway.
-          </p>
-        </div>
-      </section>
-        </div>
       </div>
     </section>
 
-
-    <!-- ====================================================================
-         TAKEAWAY  (replaces the old prototype writeup)
-         ==================================================================== -->
+    <!-- TAKEAWAY -->
     <section class="prose takeaway">
       <h2>The one thing to take away</h2>
       <p class="takeaway-lead">
@@ -269,45 +261,18 @@
         title="Interactive shot quality vs. volume explorer"
         loading="lazy"
       ></iframe>
-      <p class="explore-embed-link">
-        <a href="explore.html" target="_blank" rel="noopener">Open the explorer in its own tab &rarr;</a>
-      </p>
     </section>
 
   </main>
 
   <footer class="site-footer">
-    <p>Built with D3.js &middot; Data: shot location splits by team</p>
+    <p>Built with D3.js &middot; Shot chart data from cbbanalytics.com</p>
   </footer>
 
   <script src="proof-2525.js"></script>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://unpkg.com/scrollama"></script>
   <script src="main.js"></script>
-  <script>
-    (function () {
-      function postHeight() {
-        // full height of the explore page's content
-        const h = Math.max(
-          document.body.scrollHeight,
-          document.documentElement.scrollHeight
-        );
-        parent.postMessage({ type: "explore-height", height: h }, "*");
-      }
-
-      // report on load, on resize, and whenever the DOM changes
-      // (opening/closing the team panel changes content height)
-      window.addEventListener("load", postHeight);
-      window.addEventListener("resize", postHeight);
-
-      const obs = new MutationObserver(postHeight);
-      obs.observe(document.body, { childList: true, subtree: true, attributes: true });
-
-      // also poll briefly after load to catch the async chart render
-      let n = 0;
-      const t = setInterval(() => { postHeight(); if (++n > 20) clearInterval(t); }, 200);
-    })();
-  </script>
   <script>
     (function () {
       const frame = document.querySelector(".explore-frame");

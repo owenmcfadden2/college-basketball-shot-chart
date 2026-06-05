@@ -65,6 +65,7 @@
       <button id="conf-clear" class="conf-clear" type="button">Clear</button>
       <span id="conf-status" class="conf-status"></span>
       <input type="text" id="team-search" placeholder="Search team…" autocomplete="off" spellcheck="false" />
+      <datalist id="compare-team-list"></datalist>
     </div>
 
     <p class="conf-footnote">
@@ -80,11 +81,24 @@
     </div>
   </section>
 
-  <footer class="site-footer">
-    <p>Built with D3.js &middot; <a href="index.html">Back to the story</a></p>
-  </footer>
-
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="main-explore.js"></script>
+  <script>
+    (function () {
+      function postHeight() {
+        const h = Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight
+        );
+        parent.postMessage({ type: "explore-height", height: h }, "*");
+      }
+      window.addEventListener("load", postHeight);
+      window.addEventListener("resize", postHeight);
+      const obs = new MutationObserver(postHeight);
+      obs.observe(document.body, { childList: true, subtree: true, attributes: true });
+      let n = 0;
+      const t = setInterval(() => { postHeight(); if (++n > 20) clearInterval(t); }, 200);
+    })();
+  </script>
 </body>
 </html>
