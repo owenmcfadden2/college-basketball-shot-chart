@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Background &amp; Glossary &middot; Shot Quality vs. Shot Volume</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .gloss-hero {
+      padding: 4rem 8vw 3rem;
+      background:
+        radial-gradient(900px 400px at 90% -5%, rgba(76,195,138,0.14), transparent 60%),
+        radial-gradient(600px 400px at 5% 100%, rgba(255,122,47,0.1), transparent 60%),
+        var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .gloss-hero .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+      margin-bottom: 1.8rem;
+    }
+
+    .gloss-hero .back-link:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .gloss-hero h1 {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(2.4rem, 6vw, 4.5rem);
+      line-height: 1;
+      letter-spacing: -0.02em;
+      margin: 0 0 0.8rem;
+    }
+
+    .gloss-hero p {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--ink-soft);
+      max-width: 52ch;
+      margin: 0;
+    }
+
+    .gloss-body {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 3.5rem 1.5rem 5rem;
+    }
+
+    .gloss-section-title {
+      font-family: var(--font-body);
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      margin: 3.5rem 0 1.2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .gloss-section-title:first-of-type { margin-top: 0; }
+
+    .gloss-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+
+    @media (max-width: 620px) {
+      .gloss-grid { grid-template-columns: 1fr; }
+    }
+
+    .gloss-card {
+      background: var(--bg-soft);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 1.2rem 1.4rem;
+    }
+
+    .gloss-card.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .gloss-term {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1.15rem;
+      color: var(--ink);
+      margin: 0 0 0.3rem;
+    }
+
+    .gloss-abbr {
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .gloss-def {
+      font-size: 0.95rem;
+      color: var(--ink-soft);
+      line-height: 1.65;
+      margin: 0;
+    }
+
+    .gloss-def em { color: var(--ink); font-style: italic; }
+    .gloss-def strong { color: var(--ink); font-weight: 600; }
+
+    .gloss-formula {
+      display: inline-block;
+      margin-top: 0.55rem;
+      padding: 0.3rem 0.7rem;
+      background: rgba(255,122,47,0.1);
+      border: 1px solid rgba(255,122,47,0.25);
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: var(--accent);
+    }
+
+    .court-diagram {
+      grid-column: 1 / -1;
+      background: var(--bg-soft);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 1.4rem;
+    }
+
+    .court-diagram p {
+      font-size: 0.95rem;
+      color: var(--ink-soft);
+      margin: 0 0 1.2rem;
+      line-height: 1.65;
+    }
+
+    .zone-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.7rem;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .zone-list li {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0.65rem 0.9rem;
+      font-size: 0.9rem;
+    }
+
+    .zone-list li strong {
+      display: block;
+      color: var(--ink);
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+
+    .zone-list li span {
+      color: var(--ink-soft);
+      font-size: 0.83rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="gloss-hero">
+    <a href="index.html" class="back-link">&larr; Back to the visualization</a>
+    <h1>Background <span style="color:var(--accent);font-style:italic">&amp;</span> Glossary</h1>
+    <p>New to basketball analytics? This page explains every term and metric used in the project.</p>
+  </div>
+
+  <div class="gloss-body">
+
+    <!-- CONTEXT -->
+    <h2 class="gloss-section-title">Why these stats?</h2>
+    <div class="gloss-card full-width">
+      <p class="gloss-def">
+        Modern basketball analytics boils down to one insight: <strong>not all shots are created equal.</strong>
+        A layup at the rim and a pull-up two-pointer from the elbow both count as two points if made,
+        but the layup goes in far more often. A corner three is worth 50% more than a mid-range two,
+        yet often attempted by players who shoot it just as well. The analytics era taught coaches to
+        prioritize <em>rim attempts</em> and <em>three-pointers</em>&mdash;the two most efficient shot
+        types&mdash;over everything else. This project asks whether that wisdom actually predicts which
+        college teams win.
+      </p>
+    </div>
+
+    <!-- EFFICIENCY METRICS -->
+    <h2 class="gloss-section-title">Efficiency metrics</h2>
+    <div class="gloss-grid">
+
+      <div class="gloss-card">
+        <span class="gloss-abbr">eFG%</span>
+        <h3 class="gloss-term">Effective Field Goal Percentage</h3>
+        <p class="gloss-def">
+          A shooting efficiency stat that adjusts for the extra value of three-pointers.
+          A made three counts as 1.5 made field goals in the formula, so a team that
+          shoots 40% on threes grades out the same as one shooting 60% on twos.
+          <strong>Higher is better.</strong>
+        </p>
+        <code class="gloss-formula">(FGM + 0.5 &times; 3PM) &divide; FGA</code>
+      </div>
+
+      <div class="gloss-card">
+        <span class="gloss-abbr">FG%</span>
+        <h3 class="gloss-term">Field Goal Percentage</h3>
+        <p class="gloss-def">
+          The raw percentage of field goal attempts that a team makes, with no adjustment
+          for shot value. Used for individual zone efficiency (e.g., "what percentage of
+          rim attempts did they convert?"). <strong>Higher is better.</strong>
+        </p>
+        <code class="gloss-formula">FGM &divide; FGA</code>
+      </div>
+
+      <div class="gloss-card">
+        <span class="gloss-abbr">FGA &amp; FGA/G</span>
+        <h3 class="gloss-term">Field Goal Attempts (Per Game)</h3>
+        <p class="gloss-def">
+          <em>FGA</em> is the raw count of shot attempts. <em>FGA/G</em> normalizes it
+          per game so teams with different game totals can be compared fairly.
+          In this project, FGA/G refers specifically to <em>rim + three-point</em>
+          attempts per game&mdash;the "volume" axis of the main chart.
+        </p>
+      </div>
+
+      <div class="gloss-card">
+        <span class="gloss-abbr">FGA%</span>
+        <h3 class="gloss-term">Shot Diet Share</h3>
+        <p class="gloss-def">
+          The percentage of a team's total attempts that come from a specific zone.
+          For example, an <em>At-Rim FGA%</em> of 30% means nearly a third of the
+          team's shots are taken right at the basket. Used in the shot-diet breakdown
+          in each team's detail panel.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- SHOT ZONES -->
+    <h2 class="gloss-section-title">Shot zones</h2>
+    <div class="court-diagram">
+      <p>
+        Every field goal attempt is assigned to one of five zones based on where it was
+        taken on the court. These zones appear both in the main scatterplot axes and in
+        the detailed shot chart shown when you click a team dot.
+      </p>
+      <ul class="zone-list">
+        <li>
+          <strong>At Rim (ATR)</strong>
+          <span>Layups, dunks, and tip-ins taken within roughly 4&nbsp;ft of the basket. The highest-percentage shot in basketball.</span>
+        </li>
+        <li>
+          <strong>Paint (non-rim)</strong>
+          <span>Two-point attempts inside the lane that are <em>not</em> at the rim&mdash;short floaters and hook shots. Generally the least efficient shot type.</span>
+        </li>
+        <li>
+          <strong>Midrange</strong>
+          <span>Two-point jump shots taken outside the paint but inside the three-point arc. Low value: worth the same as a paint shot but made less often.</span>
+        </li>
+        <li>
+          <strong>Above-the-Break 3 (ATB3)</strong>
+          <span>Three-pointers taken from the top of the arc or the wings. The most common three-point attempt.</span>
+        </li>
+        <li>
+          <strong>Corner 3 (C3)</strong>
+          <span>Three-pointers from the corners of the court. These are slightly <em>closer</em> to the basket than ATB3s, making them the most efficient three-point shot.</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- RANKING & STRUCTURE -->
+    <h2 class="gloss-section-title">Rankings &amp; structure</h2>
+    <div class="gloss-grid">
+
+      <div class="gloss-card">
+        <span class="gloss-abbr">NET</span>
+        <h3 class="gloss-term">NCAA Evaluation Tool</h3>
+        <p class="gloss-def">
+          The official NCAA ranking used to seed the March Madness tournament.
+          It combines team efficiency, strength of schedule, game location, and
+          scoring margin. <strong>#1 is best; ~#365 is worst.</strong> Dot color
+          in the main chart maps directly to NET rank.
+        </p>
+      </div>
+
+      <div class="gloss-card">
+        <span class="gloss-abbr">Division I</span>
+        <h3 class="gloss-term">D-I</h3>
+        <p class="gloss-def">
+          The top tier of NCAA college basketball, consisting of roughly
+          <strong>365 programs</strong>. All teams in this project are Division I.
+          D-I is subdivided into conferences, which range from the high-profile
+          Power&nbsp;5 leagues down to smaller mid-majors.
+        </p>
+      </div>
+
+      <div class="gloss-card">
+        <span class="gloss-abbr">Conference</span>
+        <h3 class="gloss-term">Athletic Conference</h3>
+        <p class="gloss-def">
+          A grouping of teams that play a shared schedule against each other during
+          the regular season. The <em>Power&nbsp;5</em> conferences&mdash;ACC, Big&nbsp;Ten,
+          Big&nbsp;12, SEC, and Big East&mdash;contain most of the historically
+          elite programs and carry the toughest schedules.
+        </p>
+      </div>
+
+      <div class="gloss-card">
+        <span class="gloss-abbr">%ile</span>
+        <h3 class="gloss-term">Percentile Rank</h3>
+        <p class="gloss-def">
+          A team's standing relative to all other D-I teams on a given stat.
+          <strong>90th percentile</strong> means the team is better than 90% of the
+          country on that metric. Percentile chips in the team detail panel are
+          colored red&rarr;green to make comparisons instant.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- VISUALIZATION CONCEPTS -->
+    <h2 class="gloss-section-title">Visualization concepts</h2>
+    <div class="gloss-grid">
+
+      <div class="gloss-card">
+        <h3 class="gloss-term">Shot Volume</h3>
+        <p class="gloss-def">
+          In this project, <em>shot volume</em> refers specifically to
+          <strong>Rim + 3s FGA/G</strong>&mdash;the combined number of rim attempts
+          and three-point attempts per game. It is the horizontal axis of the
+          main scatterplot.
+        </p>
+      </div>
+
+      <div class="gloss-card">
+        <h3 class="gloss-term">Shot Quality</h3>
+        <p class="gloss-def">
+          In this project, <em>shot quality</em> refers specifically to
+          <strong>Rim + 3s eFG%</strong>&mdash;the effective field goal percentage
+          on rim attempts and three-pointers combined. It is the vertical axis of
+          the main scatterplot.
+        </p>
+      </div>
+
+      <div class="gloss-card">
+        <h3 class="gloss-term">Shot Diet</h3>
+        <p class="gloss-def">
+          The distribution of a team's shot attempts across the five zones. A team
+          with a good <em>shot diet</em> gets a high proportion of its attempts from
+          the most efficient zones (rim and corner three). The bar chart in each
+          team's detail panel shows this distribution.
+        </p>
+      </div>
+
+      <div class="gloss-card">
+        <h3 class="gloss-term">Median Lines</h3>
+        <p class="gloss-def">
+          The dashed lines on the main scatterplot mark the <strong>median</strong>
+          value for each axis across all 365 D-I teams. Dots above the horizontal
+          line shoot better than average; dots to the right of the vertical line
+          shoot more than average.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <footer class="site-footer">
+    <p>Built with D3.js &middot; Data: shot location splits by team</p>
+  </footer>
+
+</body>
+</html>

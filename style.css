@@ -433,6 +433,26 @@ h3 {
  
 .conf-footnote a:hover { border-bottom-color: var(--accent); }
  
+.glossary-btn {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: 0.6rem 1.3rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  border: 1.5px solid var(--accent);
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.glossary-btn:hover {
+  background: var(--accent);
+  color: var(--bg);
+}
+
 .byline {
   font-size: 0.95rem;
   color: var(--ink-soft);
