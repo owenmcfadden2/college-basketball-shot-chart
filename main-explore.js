@@ -1,14 +1,17 @@
 /* ============================================================
-   Shot Quality vs. Shot Volume - main.js
-   Core scatterplot + conference filter
+   main-explore.js
+   Standalone exploration page. This is main.js with the story
+   module and scrollama wiring removed. No story, no scroll
+   reactions — just the full interactive scatterplot with all
+   controls (filter, search, top/bottom labels, brush, panels).
    ============================================================ */
- 
+
 const MARGIN = { top: 36, right: 40, bottom: 70, left: 82 };
- 
+
 const X_COL = "Rim + 3s FGA/G";
 const Y_COL = "Rim + 3s eFG%";
 const NET_COL = "NET Ranking";
- 
+
 const CONFERENCES = [
   { id: 73, name: "Big Ten" },
   { id: 89, name: "SEC" },
@@ -42,17 +45,18 @@ const CONFERENCES = [
   { id: 18, name: "AmEast" },
   { id: 5, name: "MEAC" },
 ];
- 
+
 const ENABLED_CONFERENCES = new Set([73, 89, 60, 53, 29]);
 const POWER_5 = new Set([73, 89, 60, 53, 29]);
- 
+
 let allData = [];
 const selectedConferences = new Set();
 let selectedTeamId = null;
 let searchTerm = "";
-let annotationLimit = 0;
-let annotationBottomLimit = 0;
- 
+let annotationLimit = 10;
+let annotationBottomLimit = 10;
+let storyActive = false;   // exploration page has no story; always false
+
 let x, y, color, svg, tooltip;
 let chartWidth, chartHeight;
 
@@ -61,7 +65,7 @@ function winBinLabel(wins) {
   const end = start + 4;
   return `${start}-${end} wins`;
 }
- 
+
 d3.csv("data/shot_data.csv", d3.autoType).then((raw) => {
   allData = raw.filter(
     (d) => d[X_COL] != null && d[Y_COL] != null && d[NET_COL] != null
@@ -69,19 +73,21 @@ d3.csv("data/shot_data.csv", d3.autoType).then((raw) => {
   buildChartShell();
   buildConferenceDropdown();
   buildMetaButtons();
+  document.getElementById("annot-limit").value = 10;
+  document.getElementById("annot-bottom-limit").value = 10;
   updateDots();
 });
- 
+
 function buildChartShell() {
   // Fixed virtual drawing canvas. The viewBox scales this to fit the DOM.
   const VW = 820;   // virtual width
   const VH = 640;   // virtual height
- 
+
   const width = VW - MARGIN.left - MARGIN.right;
   const height = VH - MARGIN.top - MARGIN.bottom;
   chartWidth = width;
   chartHeight = height;
- 
+
   const [xMin, xMax] = d3.extent(allData, (d) => d[X_COL]);
   x = d3.scaleLinear()
     .domain([xMin, xMax + (xMax - xMin) * 0.08]).nice().range([0, width]);
@@ -89,7 +95,7 @@ function buildChartShell() {
     .domain(d3.extent(allData, (d) => d[Y_COL])).nice().range([height, 0]);
   color = d3.scaleSequential(d3.interpolateRdYlGn)
     .domain([d3.max(allData, (d) => d[NET_COL]), d3.min(allData, (d) => d[NET_COL])]);
- 
+
   svg = d3.select("#chart")
     .append("svg")
     .attr("viewBox", `0 0 ${VW} ${VH}`)
@@ -98,12 +104,12 @@ function buildChartShell() {
     .attr("height", "100%")
     .append("g")
     .attr("transform", `translate(${MARGIN.left},${MARGIN.top})`);
- 
+
   svg.append("g").attr("class", "axis")
     .attr("transform", `translate(0,${height})`).call(d3.axisBottom(x).ticks(9));
   svg.append("g").attr("class", "axis")
     .call(d3.axisLeft(y).ticks(9).tickFormat(d3.format(".0%")));
- 
+
   svg
     .append("text")
     .attr("class", "axis-label")
@@ -111,7 +117,7 @@ function buildChartShell() {
     .attr("y", height + 45)
     .attr("text-anchor", "middle")
     .text("Rim + 3s Attempts Per Game  (Volume \u2192)");
- 
+
   svg
     .append("text")
     .attr("class", "axis-label")
@@ -120,15 +126,15 @@ function buildChartShell() {
     .attr("y", -50)
     .attr("text-anchor", "middle")
     .text("Rim + 3s eFG%  (Quality \u2192)");
- 
+
   const xMed = d3.median(allData, (d) => d[X_COL]);
   const yMed = d3.median(allData, (d) => d[Y_COL]);
- 
+
   svg.append("line").attr("class", "median-line")
     .attr("x1", x(xMed)).attr("x2", x(xMed)).attr("y1", 0).attr("y2", height);
   svg.append("line").attr("class", "median-line")
     .attr("x1", 0).attr("x2", width).attr("y1", y(yMed)).attr("y2", y(yMed));
- 
+
   // quadrant fills + labels
   const qDefs = [
     { x1: x(xMed), y1: 0,       x2: width,   y2: y(yMed), fill: "#4cc38a", lbl: "Elite Offenses"        },
@@ -147,11 +153,15 @@ function buildChartShell() {
       .attr("text-anchor", "middle").attr("dominant-baseline", "middle")
       .text(q.lbl.toUpperCase());
   });
- 
+
   tooltip = d3.select("#tooltip");
- 
+
+  const brush = d3.brush()
+    .extent([[0, 0], [chartWidth, chartHeight]])
+    .on("end", brushed);
+  svg.append("g").attr("class", "brush").call(brush);
 }
- 
+
 function brushed(event) {
   if (!event.selection) return;
   const [[x0, y0], [x1, y1]] = event.selection;
@@ -166,12 +176,12 @@ function brushed(event) {
   if (inside.length === 0) showEmptyBrush();
   else showGroupPanel(inside);
 }
- 
+
 function updateDots() {
   const filtered = selectedConferences.size === 0
     ? allData
     : allData.filter((d) => selectedConferences.has(d.conferenceId));
- 
+
   svg.selectAll(".dot")
     .data(allData, (d) => d.teamId)
     .join(
@@ -218,21 +228,27 @@ function updateDots() {
     .on("mouseout", function (event, d) {
       d3.select(this).attr("r", d.teamId === selectedTeamId ? 7.5 : 5.5);
       tooltip.style("opacity", 0);
+    })
+    .on("click", function (event, d) {
+      selectedTeamId = d.teamId;
+      svg.selectAll(".dot").classed("selected", false).attr("r", 5.5);
+      d3.select(this).classed("selected", true).attr("r", 7.5);
+      showTeamPanel(d);
     });
- 
+
   if (selectedTeamId != null) {
     svg.selectAll(".dot")
       .filter((d) => d.teamId === selectedTeamId)
       .classed("selected", true).attr("r", 7.5);
   }
- 
+
   updateFilterStatus(filtered.length);
   updateAnnotations(filtered);
 }
 
 function updateAnnotations(visible) {
   svg.selectAll(".annotations-layer").remove();
-  if (storyActive) return;   // no annotation labels during the story
+  if (storyActive) return;   // (always false here; kept for parity with main.js)
   const layer = svg.append("g").attr("class", "annotations-layer");
   const st = searchTerm.toLowerCase();
 
@@ -280,7 +296,7 @@ function buildMetaButtons() {
     updateDots();
   });
 }
- 
+
 function buildConferenceDropdown() {
   const menu = d3.select("#conf-menu");
   CONFERENCES.forEach((conf, i) => {
@@ -307,11 +323,9 @@ function buildConferenceDropdown() {
     selectedConferences.clear();
     menu.selectAll("input").property("checked", false);
 
-    // also clear search
     searchTerm = "";
     document.getElementById("team-search").value = "";
 
-    // also clear top/bottom annotation limits
     annotationLimit = 0;
     annotationBottomLimit = 0;
     document.getElementById("annot-limit").value = "";
@@ -320,7 +334,7 @@ function buildConferenceDropdown() {
     updateDots();
   });
 }
- 
+
 function updateFilterStatus(count) {
   const status = document.getElementById("conf-status");
   if (selectedConferences.size === 0) {
@@ -331,10 +345,10 @@ function updateFilterStatus(count) {
     status.innerHTML = `Showing ${count} teams from: ${parts.join(", ")}`;
   }
 }
- 
+
 const CONF_NAME = Object.fromEntries(CONFERENCES.map((c) => [c.id, c.name]));
 const CONF_RANK = Object.fromEntries(CONFERENCES.map((c, i) => [c.id, i + 1]));
- 
+
 const ZONES = [
   { label: "At Rim",            rate: "ATR2 FGA%",  ratePct: "ATR2 FGA% %ile",  eff: "ATR2 FG%",  effPct: "ATR2 FG% %ile"  },
   { label: "Paint (non-rim)",   rate: "PAINT2 FGA%", ratePct: "PAINT2 FGA% %ile",eff: "PAINT2 FG%",effPct: "PAINT2 FG% %ile"},
@@ -342,32 +356,31 @@ const ZONES = [
   { label: "Above-the-Break 3", rate: "ATB3 FGA%",  ratePct: "ATB3 FGA% %ile",  eff: "ATB3 FG%",  effPct: "ATB3 FG% %ile"  },
   { label: "Corner 3",          rate: "C3 FGA%",    ratePct: "C3 FGA% %ile",    eff: "C3 FG%",    effPct: "C3 FG% %ile"    },
 ];
- 
+
 const dietBarScale = d3.scaleLinear().domain([0, 0.5]).range([0, 110]).clamp(true);
- 
+
 function showTeamPanel(d) {
-  document.body.classList.add("panel-open");
   const panel = d3.select("#team-panel");
   panel.classed("active", true);
   panel.html("");
- 
+
   const header = panel.append("div").attr("class", "tp-header");
   const titleWrap = header.append("div");
   titleWrap.append("h3").attr("class", "tp-name").text(d.teamMarket);
- 
+
   const confName = CONF_NAME[d.conferenceId] || "Unknown";
   const confRank = CONF_RANK[d.conferenceId];
   const overallLosses = d["GP*"] - d.Wins;
- 
+
   titleWrap.append("p").attr("class", "tp-sub")
     .text(`${confName} (#${confRank} conf) · NET #${d[NET_COL]} · ${winBinLabel(d.Wins)} · record ${d.Wins}-${overallLosses} · ${d.confWins} conf wins`);
   header.append("button").attr("class", "tp-close").attr("type", "button")
     .html("&times;").on("click", closeTeamPanel);
- 
+
   const headline = panel.append("div").attr("class", "tp-headline");
   addHeadlineStat(headline, "Shot Quality", `${(d[Y_COL] * 100).toFixed(1)}% eFG`, d["Rim + 3s eFG% %ile"], "on Rim + 3s shots");
   addHeadlineStat(headline, "Shot Volume",  `${d[X_COL].toFixed(1)} / game`,        d["Rim + 3s FGA/G %ile"], "Rim + 3s attempts");
- 
+
   panel.append("h4").attr("class", "tp-section-title").text("Shot chart");
   panel.node().appendChild(buildCourtChart(d));
 
@@ -377,7 +390,7 @@ function showTeamPanel(d) {
   head.append("span").text("Zone");
   head.append("span").text("Share of FGA");
   head.append("span").text("FG%");
- 
+
   ZONES.forEach((z) => {
     const row = table.append("div").attr("class", "tp-zone-row");
     row.append("span").attr("class", "tp-zone-label").text(z.label);
@@ -389,35 +402,33 @@ function showTeamPanel(d) {
     effCell.append("span").attr("class", "tp-pct-chip")
       .style("background", pctColor(d[z.effPct])).text(`${pctLabel(d[z.effPct])}`);
   });
- 
+
   document.getElementById("team-panel").scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
- 
+
 function closeTeamPanel() {
-  document.body.classList.remove("panel-open");
   const panel = d3.select("#team-panel");
   panel.classed("active", false);
   panel.html('<p class="team-panel-hint">Click any team\'s dot to see its full shot profile.</p>');
   selectedTeamId = null;
   svg.selectAll(".dot").classed("selected", false).attr("r", 5.5);
 }
- 
+
 function showEmptyBrush() {
   const panel = d3.select("#team-panel");
   panel.html('<p class="team-panel-hint">No teams in that selection. Try a wider brush.</p>');
 }
- 
+
 function avg(teams, col) { return d3.mean(teams, (d) => d[col]); }
- 
+
 function showGroupPanel(teams) {
-  document.body.classList.add("panel-open");
   selectedTeamId = null;
   svg.selectAll(".dot").classed("selected", false).attr("r", 5.5);
- 
+
   const panel = d3.select("#team-panel");
   panel.classed("active", true);
   panel.html("");
- 
+
   const header = panel.append("div").attr("class", "tp-header");
   const titleWrap = header.append("div");
   titleWrap.append("h3").attr("class", "tp-name").text(`${teams.length} teams selected`);
@@ -427,11 +438,11 @@ function showGroupPanel(teams) {
       svg.select(".brush").call(d3.brush().move, null);
       closeTeamPanel();
     });
- 
+
   const headline = panel.append("div").attr("class", "tp-headline");
   addHeadlineStat(headline, "Avg Shot Quality", `${(avg(teams, Y_COL) * 100).toFixed(1)}% eFG`, avg(teams, "Rim + 3s eFG% %ile"), "on Rim + 3s shots");
   addHeadlineStat(headline, "Avg Shot Volume",  `${avg(teams, X_COL).toFixed(1)} / game`,        avg(teams, "Rim + 3s FGA/G %ile"), "Rim + 3s attempts");
- 
+
   const avgVals = {};
   [
     "ATR2 FG%","ATR2 FGA%","ATR2 FG% %ile",
@@ -449,7 +460,7 @@ function showGroupPanel(teams) {
   head.append("span").text("Zone");
   head.append("span").text("Avg share of FGA");
   head.append("span").text("Avg FG%");
- 
+
   ZONES.forEach((z) => {
     const avgRate = avg(teams, z.rate);
     const avgEff  = avg(teams, z.eff);
@@ -464,10 +475,10 @@ function showGroupPanel(teams) {
     effCell.append("span").attr("class", "tp-pct-chip")
       .style("background", pctColor(avgEffPct)).text(pctLabel(avgEffPct));
   });
- 
+
   document.getElementById("team-panel").scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
- 
+
 function addHeadlineStat(parent, label, value, pctile, note) {
   const block = parent.append("div").attr("class", "tp-stat");
   block.append("div").attr("class", "tp-stat-label").text(label);
@@ -478,7 +489,7 @@ function addHeadlineStat(parent, label, value, pctile, note) {
     .style("width", `${pctile * 100}%`).style("background", pctColor(pctile));
   block.append("div").attr("class", "tp-stat-pct").text(`${pctLabel(pctile)} percentile`);
 }
- 
+
 function pctLabel(p) { return `${Math.round(p * 100)}th`; }
 function pctColor(p) { return d3.interpolateRdYlGn(p); }
 
@@ -501,7 +512,6 @@ function buildCourtChart(vals) {
   const midY = (cornerY + baselineY) / 2;
   const atbLabelY = Math.max(26, BY - arcR - 14);
 
-  // Each zone has a list of label anchor points (supports symmetric zones)
   const zDefs = [
     {
       label: "Paint",
@@ -559,7 +569,6 @@ function buildCourtChart(vals) {
     .attr("viewBox", `0 0 ${W} ${H}`)
     .attr("width", W).attr("height", H);
 
-  // Warm dark background — subtle glow near the baseline like stadium lighting
   const defs = svgEl.append("defs");
   const bgId = `cBg${Math.floor(Math.random() * 1e8)}`;
   const bgGrad = defs.append("radialGradient")
@@ -569,25 +578,21 @@ function buildCourtChart(vals) {
   svgEl.append("rect").attr("width", W).attr("height", H)
     .attr("fill", `url(#${bgId})`).attr("rx", 10);
 
-  // Zone bloom filter — heavily blurred color that bleeds across zone edges
   const glowId = `zg${Math.floor(Math.random() * 1e8)}`;
   defs.append("filter").attr("id", glowId)
     .attr("x", "-40%").attr("y", "-40%").attr("width", "180%").attr("height", "180%")
     .append("feGaussianBlur").attr("in", "SourceGraphic").attr("stdDeviation", 24);
 
-  // Rim glow filter — tight bloom for the basket ring
   const rimGlowId = `rg${Math.floor(Math.random() * 1e8)}`;
   defs.append("filter").attr("id", rimGlowId)
     .attr("x", "-200%").attr("y", "-200%").attr("width", "500%").attr("height", "500%")
     .append("feGaussianBlur").attr("in", "SourceGraphic").attr("stdDeviation", 12);
 
-  // Border glow filter — tight blur applied to colored strokes only
   const borderGlowId = `bg${Math.floor(Math.random() * 1e8)}`;
   defs.append("filter").attr("id", borderGlowId)
     .attr("x", "-60%").attr("y", "-60%").attr("width", "220%").attr("height", "220%")
     .append("feGaussianBlur").attr("in", "SourceGraphic").attr("stdDeviation", 10);
 
-  // Border glow layer — same path drawn 5 times to saturate the halo
   const borderGlowLayer = svgEl.append("g").attr("opacity", 1);
   zDefs.forEach((z) => {
     for (let i = 0; i < 3; i++) {
@@ -601,7 +606,6 @@ function buildCourtChart(vals) {
     }
   });
 
-  // Glow underlay — blurred zone colors drawn beneath the sharp fills
   const glowLayer = svgEl.append("g").attr("opacity", 0.55);
   zDefs.forEach((z) => {
     glowLayer.append("path")
@@ -611,7 +615,6 @@ function buildCourtChart(vals) {
       .attr("filter", `url(#${glowId})`);
   });
 
-  // Zone fills (sharp, on top of glow)
   const zoneG = svgEl.append("g");
   zDefs.forEach((z) => {
     zoneG.append("path")
@@ -638,21 +641,17 @@ function buildCourtChart(vals) {
       });
   });
 
-  // Court lines
   const lineG = svgEl.append("g")
     .attr("fill", "none").attr("stroke", "black").attr("stroke-width", 1.8);
   lineG.append("line").attr("x1", 0).attr("y1", baselineY).attr("x2", W).attr("y2", baselineY);
   lineG.append("rect").attr("x", paintX1).attr("y", paintY)
     .attr("width", paintX2 - paintX1).attr("height", baselineY - paintY);
   lineG.append("circle").attr("cx", BX).attr("cy", paintY).attr("r", 6 * SC);
-  // 3-point straight segments only — no arc line drawn between corners
   lineG.append("line").attr("x1", ax1).attr("y1", baselineY).attr("x2", ax1).attr("y2", cornerY);
   lineG.append("line").attr("x1", ax2).attr("y1", baselineY).attr("x2", ax2).attr("y2", cornerY);
-  // Block marks (short horizontal tick at base of paint)
   const blockY = baselineY - 3 * SC, tick = 0.6 * SC;
   lineG.append("line").attr("x1", paintX1 - tick).attr("y1", blockY).attr("x2", paintX1).attr("y2", blockY);
   lineG.append("line").attr("x1", paintX2).attr("y1", blockY).attr("x2", paintX2 + tick).attr("y2", blockY);
-  // Basket ring and backboard
   svgEl.append("circle").attr("cx", BX).attr("cy", BY).attr("r", 0.75 * SC)
     .attr("fill", "none").attr("stroke", "black").attr("stroke-width", 2);
   svgEl.append("line")
@@ -660,7 +659,6 @@ function buildCourtChart(vals) {
     .attr("x2", BX + 3 * SC).attr("y2", BY + 2.2 * SC)
     .attr("stroke", "black").attr("stroke-width", 2.5);
 
-  // Two-line zone labels: zone name (small, muted) + FG% (large, bold, outlined)
   const labelG = svgEl.append("g")
     .attr("text-anchor", "middle").attr("pointer-events", "none")
     .attr("font-family", "Archivo, var(--font-body, sans-serif)");
@@ -683,9 +681,7 @@ function buildCourtChart(vals) {
   zDefs.forEach((z) => {
     if (z.fg == null) return;
     z.anchors.forEach(({ x, y }) => {
-      // Zone name — Archivo (site body font)
       txt(x, y - 12, z.label, 12, "500", "rgba(255,255,255,0.55)", "#0a0806", 3);
-      // FG% — Fraunces (site display font), bold, white with dark outline
       const pctStr = `${(z.fg * 100).toFixed(1)}%`;
       labelG.append("text")
         .attr("x", x).attr("y", y + 10)
@@ -703,7 +699,6 @@ function buildCourtChart(vals) {
     });
   });
 
-  // Legend
   const legendDiv = wrap.append("div").attr("class", "court-legend");
   legendDiv.append("span").attr("class", "court-legend-label").text("Worst");
   legendDiv.append("div").attr("class", "court-legend-bar");
@@ -712,154 +707,3 @@ function buildCourtChart(vals) {
 
   return wrap.node();
 }
-
-/* ============================================================
-   STORY MODULE  —  paste this block into main.js
-   Place it AFTER buildChartShell() / updateDots() are defined.
-   It reuses your existing globals: x, y, svg, allData, chartWidth,
-   chartHeight, X_COL, Y_COL, NET_COL, updateDots(), color.
- 
-   Requires Scrollama (added via <script> in index.html).
-   ============================================================ */
- 
-// Teams the story spotlights, by exact teamMarket string.
-const STORY_TEAMS = {
-  elite:    ["Michigan", "Duke", "Florida"],                 // TR: have both
-  selective:["Houston", "Arizona", "Purdue", "Michigan St."],// TL: low vol, high qual
-  wasteful: ["Cal Poly", "Elon", "Youngstown St."],          // BR: high vol, low qual
-};
- 
-let storyActive = false;   // when true, free-exploration dimming is suspended
-let STORY_MED = {};        // cached medians
- 
-function storyMedians() {
-  if (STORY_MED.x == null) {
-    STORY_MED.x = d3.median(allData, (d) => d[X_COL]);
-    STORY_MED.y = d3.median(allData, (d) => d[Y_COL]);
-  }
-  return STORY_MED;
-}
- 
-// Clear every story-applied class/state from the dots.
-function resetStoryDots() {
-  svg.selectAll(".dot")
-    .classed("story-dim", false)
-    .classed("story-hi", false)
-    .attr("r", (d) => (d.teamId === selectedTeamId ? 7.5 : 5.5));
-  svg.selectAll(".story-annotation").remove();
-  svg.selectAll(".story-zone-veil").remove();
-  svg.selectAll(".annotations-layer").remove();   // clear top/bottom labels on re-entry
-  svg.selectAll(".dot").classed("dimmed", false);
-}
- 
-// Helper: does this datum match a list of teamMarket names?
-function inList(d, names) { return names.includes(d.teamMarket); }
- 
-// Draw a small text callout near a team's dot.
-function storyLabel(d, text, dy) {
-  svg.append("text")
-    .attr("class", "story-annotation")
-    .attr("x", x(d[X_COL]) + 9)
-    .attr("y", y(d[Y_COL]) + (dy || 4))
-    .text(text || d.teamMarket);
-}
- 
-/* ---- the steps ---------------------------------------------------------- */
-/* Each step is a pure function of the dot selection. Steps are idempotent:
-   they fully reset first, then apply their own emphasis.                    */
- 
-function applyStoryStep(step) {
-  storyActive = true;
-  document.body.classList.add("story-mode");   // <-- hides controls via CSS
-  resetStoryDots();
-  const med = storyMedians();
-  const dots = svg.selectAll(".dot");
- 
-  switch (step) {
-    case 0:
-      break;
- 
-    case 1:
-      dots.classed("story-dim", (d) => !inList(d, STORY_TEAMS.elite));
-      dots.filter((d) => inList(d, STORY_TEAMS.elite))
-        .classed("story-hi", true).attr("r", 8.5);
-      svg.selectAll(".dot").filter((d) => inList(d, STORY_TEAMS.elite))
-        .each(function (d) { storyLabel(d, d.teamMarket, -10); });
-      break;
- 
-    case 2:
-      dots.classed("story-dim", (d) => d[X_COL] < med.x);
-      break;
- 
-    case 3:
-      dots.classed("story-dim", (d) => !inList(d, STORY_TEAMS.wasteful));
-      dots.filter((d) => inList(d, STORY_TEAMS.wasteful))
-        .classed("story-hi", true).attr("r", 8.5);
-      svg.selectAll(".dot").filter((d) => inList(d, STORY_TEAMS.wasteful))
-        .each(function (d) { storyLabel(d, `${d.teamMarket} · NET #${d[NET_COL]}`, -10); });
-      break;
- 
-    case 4:
-      dots.classed("story-dim", (d) => !inList(d, STORY_TEAMS.selective));
-      dots.filter((d) => inList(d, STORY_TEAMS.selective))
-        .classed("story-hi", true).attr("r", 8.5);
-      svg.selectAll(".dot").filter((d) => inList(d, STORY_TEAMS.selective))
-        .each(function (d) { storyLabel(d, `${d.teamMarket} · NET #${d[NET_COL]}`, -10); });
-      break;
- 
-    case 5:
-      dots.classed("story-dim", (d) => d[Y_COL] < med.y);
-      break;
- 
-      case 6:
-      // story stays as-is; exploration now lives on explore.html
-      storyActive = true;
-      break;
-  }
-}
-
-/* ============================================================
-   SCROLLAMA WIRING  —  paste at the very BOTTOM of main.js
-   (after the d3.csv(...).then(...) block and all functions).
-   ============================================================ */
- 
-function initStoryScroll() {
-  if (typeof scrollama === "undefined") return; // library not loaded yet
- 
-  const scroller = scrollama();
- 
-  scroller
-    .setup({
-      step: ".story-step",
-      offset: 0.6,       // trigger when step is 60% up the viewport
-      progress: false,
-    })
-    .onStepEnter((response) => {
-      const stepIndex = +response.element.dataset.step;
-      applyStoryStep(stepIndex);
-      response.element.classList.add("is-active");
-    })
-    .onStepExit((response) => {
-      response.element.classList.remove("is-active");
-    });
- 
-  window.addEventListener("resize", scroller.resize);
-}
- 
-// allData loads asynchronously; wait until the chart exists, then wire scroll.
-function waitForChartThenScroll() {
-  if (svg && allData.length) {
-    initStoryStep0Guard();
-    initStoryScroll();
-  } else {
-    setTimeout(waitForChartThenScroll, 120);
-  }
-}
- 
-// Before the reader scrolls into the story, make sure the chart starts neutral.
-function initStoryStep0Guard() {
-  // nothing emphasized until the first step enters
-  storyActive = false;
-}
- 
-waitForChartThenScroll();

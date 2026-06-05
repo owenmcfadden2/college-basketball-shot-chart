@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Explore the Data — Shot Quality vs. Shot Volume</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,400&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <section class="viz-section">
+    <div class="viz-header">
+      <div class="viz-header-text">
+        <h2>Explore Every Team</h2>
+        <p class="viz-caption">
+          Each dot is a Division&nbsp;I team. Horizontal is how often they shoot
+          rim attempts and threes; vertical is how well they shoot them. Filter,
+          search, click a dot for its full shot profile, or drag a box to compare a group.
+        </p>
+      </div>
+
+      <div class="net-legend">
+        <div class="net-legend-head">
+          <span class="net-legend-title">Dot Color Legend</span>
+          <span class="net-legend-note">Dots are colored by NET Ranking. Green means stronger, red means weaker.</span>
+          <a class="net-legend-link" href="https://www.ncaa.com/news/basketball-men/article/2022-12-05/college-basketballs-net-rankings-explained" target="_blank" rel="noopener noreferrer">For more information on NET rankings &rarr;</a>
+        </div>
+        <div class="net-bin-legend" aria-label="NET ranking color bins">
+          <div class="net-bin" style="--bin-color:#1a9850">
+            <span class="net-bin-swatch"></span><span class="net-bin-label">Best</span><span class="net-bin-range">#1-73</span>
+          </div>
+          <div class="net-bin" style="--bin-color:#91cf60">
+            <span class="net-bin-swatch"></span><span class="net-bin-label">Strong</span><span class="net-bin-range">#74-146</span>
+          </div>
+          <div class="net-bin" style="--bin-color:#d9ef8b">
+            <span class="net-bin-swatch"></span><span class="net-bin-label">Solid</span><span class="net-bin-range">#147-219</span>
+          </div>
+          <div class="net-bin" style="--bin-color:#fc8d59">
+            <span class="net-bin-swatch"></span><span class="net-bin-label">Weak</span><span class="net-bin-range">#220-292</span>
+          </div>
+          <div class="net-bin" style="--bin-color:#d73027">
+            <span class="net-bin-swatch"></span><span class="net-bin-label">Worst</span><span class="net-bin-range">#293-365</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="conf-filter">
+      <div id="conf-dropdown" class="conf-dropdown">
+        <button id="conf-button" class="conf-button" type="button">
+          Filter by conference
+          <span class="conf-caret">&#9662;</span>
+        </button>
+        <div id="conf-menu" class="conf-menu"></div>
+      </div>
+      <label class="annot-label" for="annot-limit">Label top</label>
+      <input type="number" id="annot-limit" class="annot-input" min="0" max="365" placeholder="—" />
+      <span class="annot-label">teams</span>
+      <label class="annot-label" for="annot-bottom-limit">bottom</label>
+      <input type="number" id="annot-bottom-limit" class="annot-input" min="0" max="365" placeholder="—" />
+      <span class="annot-label">teams</span>
+      <button id="conf-major" class="conf-meta-btn" type="button">Power 5</button>
+      <button id="conf-clear" class="conf-clear" type="button">Clear</button>
+      <span id="conf-status" class="conf-status"></span>
+      <input type="text" id="team-search" placeholder="Search team…" autocomplete="off" spellcheck="false" />
+    </div>
+
+    <p class="conf-footnote">
+      Conferences are listed in order of their
+      <a href="https://barttorvik.com/?year=2026&amp;sort=&amp;hteam=&amp;t2value=&amp;conlimit=All&amp;state=All&amp;conyes=1&amp;begin=20251101&amp;end=20260501&amp;top=0&amp;revquad=0&amp;quad=5&amp;venue=All&amp;type=All&amp;mingames=0" target="_blank" rel="noopener noreferrer">Bart Torvik conference rankings</a>.
+    </p>
+
+    <div id="chart"></div>
+    <div id="tooltip" class="tooltip" role="status"></div>
+
+    <div id="team-panel" class="team-panel">
+      <p class="team-panel-hint">Click any team's dot to see its full shot profile.</p>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <p>Built with D3.js &middot; <a href="index.html">Back to the story</a></p>
+  </footer>
+
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="main-explore.js"></script>
+</body>
+</html>
