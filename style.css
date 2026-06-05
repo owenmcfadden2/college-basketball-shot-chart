@@ -1115,3 +1115,176 @@ body:not(.story-mode) .scrolly-graphic .viz-header-text {
 body:not(.story-mode) .scrolly-graphic .net-legend {
   display: none;
 }
+
+/* prominent handoff to the exploration page at the end of the story */
+.explore-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+  padding: 0.9rem 1.5rem;
+  background: var(--accent-2);
+  color: #0e1116;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 10px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 6px 24px rgba(76, 195, 138, 0.3);
+}
+.explore-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 32px rgba(76, 195, 138, 0.45);
+}
+.explore-cta-arrow { font-size: 1.4rem; }
+.explore-cta-sub {
+  margin-top: 0.8rem;
+  font-size: 0.95rem;
+  opacity: 0.7;
+}
+
+/* explore page: cap the chart size so the full plot is visible */
+.viz-section #chart {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+/* explore page: keep all 5 NET bins on one row */
+.viz-section .net-bin-legend {
+  flex-wrap: nowrap;
+}
+.viz-section .net-bin {
+  min-width: 0;
+  flex: 1 1 0;
+}
+
+/* ============================================================
+   25 / 25 PROOF SECTION
+   --proof-w controls the width of the squares + head row together.
+   Raise it to enlarge the whole graphic; lower to shrink.
+   ============================================================ */
+.proof-section {
+  --proof-w: 680px;        /* size dial for the squares + head row */
+  max-width: 920px;
+  margin: 4rem auto 0;
+  padding: 0 1.5rem;
+  text-align: center;
+}
+
+.proof-intro {
+  max-width: 60ch;
+  margin: 0.4rem auto 1.8rem;
+  font-size: 1.15rem;
+  color: var(--ink-soft);
+}
+
+.proof-2525 {
+  padding: 1.6rem 1.8rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.proof-row { margin-bottom: 1.5rem; }
+.proof-row:last-of-type { margin-bottom: 0.9rem; }
+
+.proof-row-head,
+.proof-squares {
+  max-width: var(--proof-w);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.proof-row-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.55rem;
+}
+
+.proof-squares { width: 100%; height: auto; display: block; }
+
+.proof-row-label { font-size: 1.05rem; color: var(--ink-soft); }
+
+.proof-row-count {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.45rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.proof-count-full { color: var(--accent-2); }
+.proof-count-partial { color: var(--ink-soft); }
+
+.proof-caption {
+  max-width: var(--proof-w);
+  margin: 0.9rem auto 0;
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+/* shared: bolded words inside the proof text */
+.proof-row-label strong,
+.proof-caption strong { color: var(--ink); font-weight: 600; }
+
+/* ============================================================
+   EMBEDDED EXPLORER (iframe at bottom of story page)
+   ============================================================ */
+.explore-embed {
+  max-width: 1200px;
+  margin: 4rem auto 0;
+  padding: 0 1.5rem 4rem;
+  text-align: center;
+}
+
+.explore-embed-intro {
+  max-width: 62ch;
+  margin: 0.4rem auto 1.6rem;
+  font-size: 1.1rem;
+  color: var(--ink-soft);
+}
+
+.explore-frame {
+  width: 100%;
+  height: 900px;        /* tall enough that the chart + panel never scroll internally */
+  border: none;          /* no box border */
+  border-radius: 0;
+  background: transparent;
+  display: block;
+  overflow: hidden;
+}
+
+.explore-embed-link {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+.explore-embed-link a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s ease;
+}
+.explore-embed-link a:hover { border-bottom-color: var(--accent); }
+
+.proof-tip {
+  position: fixed;
+  pointer-events: none;
+  z-index: 50;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 0.5rem 0.7rem;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  text-align: left;
+  max-width: 260px;
+}
+.proof-tip-name { font-weight: 700; }
+.proof-tip-row { color: #444; }
+.proof-tip-row strong { color: #111; font-weight: 700; }

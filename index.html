@@ -165,41 +165,58 @@
           </p>
         </div>
 
-        <div class="story-step" data-step="5">
-          <p>
-            And this is the punchline. Dim the entire bottom half&mdash;every
-            low-quality team&mdash;and watch what disappears: <strong>all of the green.</strong>
-            Across all 365 teams, <strong>every single top-25 team is above-median in shot
-            quality.</strong> Only 15 of those 25 are above-median in volume. Quality is
-            the price of admission. Volume is optional.
-          </p>
-        </div>
-
-        <div class="story-step" data-step="6">
+        <div class="story-step story-step-final" data-step="6">
           <p>
             So the answer to our question: the best offenses don't shoot
-            <em>more</em>&mdash;they shoot <em>better</em>. Now the chart is yours.
-            To cut through the crowding, we've highlighted the <strong>top 10</strong>
-            and <strong>bottom 10</strong> teams by default&mdash;but explore however you
-            like. Hit <em>Clear</em> to see all 365 at once, filter by conference, search
-            your team, click any dot for its full shot profile, or drag a box to compare
-            a group.
+            <em>more</em>&mdash;they shoot <em>better</em>. Volume is a style choice;
+            quality is the requirement.
           </p>
         </div>
         </div>
       </div>
     </section>
 
-    <!-- ====================================================================
-         FREE-EXPLORATION ZONE
-         The team / group panel renders here after a click or brush. This sits
-         below the scrolly so it doesn't fight the sticky chart.
-         ==================================================================== -->
-    <section class="explore-zone">
-      <div id="team-panel" class="team-panel">
-        <p class="team-panel-hint">Click any team's dot above to see its full shot profile.</p>
+     </section>  <!-- end of .scrolly -->
+
+    <!-- 25/25 proof graphic, full width below the story -->
+    <section class="proof-section">
+      <h2>The proof, counted</h2>
+        <p class="proof-intro">
+          We keep saying the best teams shoot better, not more. Here is that claim
+          made literal: the 25 best teams in the country, ranked left to right by NET.
+          Hover any square to see the team.
+        </p>
+      
+        <div class="proof-2525">
+          <div class="proof-row">
+            <div class="proof-row-head">
+              <span class="proof-row-label">Above-median <strong>shot quality</strong></span>
+              <span class="proof-row-count proof-count-full">25 / 25</span>
+            </div>
+            <svg id="proof-quality-row" class="proof-squares" xmlns="http://www.w3.org/2000/svg"
+                aria-label="Top 25 teams, shot quality vs median"></svg>
+          </div>
+      
+          <div class="proof-row">
+            <div class="proof-row-head">
+              <span class="proof-row-label">Above-median <strong>shot volume</strong></span>
+              <span class="proof-row-count proof-count-partial">15 / 25</span>
+            </div>
+            <svg id="proof-volume-row" class="proof-squares" xmlns="http://www.w3.org/2000/svg"
+                aria-label="Top 25 teams, shot volume vs median"></svg>
+          </div>
+      
+          <p class="proof-caption">
+            Ranked left to right, #1 to #25 by NET. Each square is one team. Every one
+            shoots above-average <strong>quality</strong>. Ten shoot below-average
+            <strong>volume</strong> and are elite anyway.
+          </p>
+        </div>
+      </section>
+        </div>
       </div>
     </section>
+
 
     <!-- ====================================================================
          TAKEAWAY  (replaces the old prototype writeup)
@@ -226,22 +243,21 @@
         rescues a team that is low on the vertical axis (quality).
       </p>
     </section>
-
-        <!-- TEMPORARY: prototype writeup for grading checkoff. Remove after graded. -->
-    <section class="prose writeup">
-      <h2>Project Writeup - TEMPORARY - REMOVE LATER</h2>
-      <h3>What have you done so far?</h3>
-      <p>
-        So far, we've initialized the first version of our core visualization, plotting Shot Volume (x) against Shot Quality (y). Both axes focus on Rim Attempts and 3-Pointers, widely considered the most efficient shots in basketball.
-        Shot Volume is the number of these attempts per game, and Shot Quality is the eFG% on them. We also added a conference filter, allowing the viewer to select only certain conferences (ordered in the dropdown menu by conference rank). You can also click on any
-        individual dot (which are colored by their net rating) to see a more in depth profile on each team's shooting profile (in depth shot quality, shot volume and additional shot diet data). We also have a brush tool allowing you to highlight regions of the chart
-        and will show these same additional stats aggregated for all highlighted teams. Lastly, we're working on building out individual pages for each conference but we haven't set up all conferences or added much content to those that we have created.
+    
+    <section class="explore-embed">
+      <h2>Now explore it yourself</h2>
+      <p class="explore-embed-intro">
+        Every Division I team, fully interactive. Filter by conference, search a
+        team, click any dot for its full shot profile, or drag a box to compare a group.
       </p>
-      <h3>What will be the most challenging part to design, and why?</h3>
-      <p>
-        The most challenging aspect of our project will be the temporal aspect we hope to add. We'd like to add shot data for the last 5-10 seasons, to show how shooting trends have changed overall within college basketball, especially within winning teams. Another
-        challenge we expect to face is making the project easily digestible for viewers who may not be familiar with college basketball at all (for example what do all of these statistics and numbers mean). For this we plan to add a large section dedicated to introducing
-        viewers to the concepts we dive more heavily into. We're waiting to add this until we build out more of the project, so we know what stats, terms, and concepts are most important to contextualize.
+      <iframe
+        class="explore-frame"
+        src="explore.html"
+        title="Interactive shot quality vs. volume explorer"
+        loading="lazy"
+      ></iframe>
+      <p class="explore-embed-link">
+        <a href="explore.html" target="_blank" rel="noopener">Open the explorer in its own tab &rarr;</a>
       </p>
     </section>
 
@@ -251,8 +267,44 @@
     <p>Built with D3.js &middot; Data: shot location splits by team</p>
   </footer>
 
+  <script src="proof-2525.js"></script>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://unpkg.com/scrollama"></script>
   <script src="main.js"></script>
+  <script>
+    (function () {
+      function postHeight() {
+        // full height of the explore page's content
+        const h = Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight
+        );
+        parent.postMessage({ type: "explore-height", height: h }, "*");
+      }
+
+      // report on load, on resize, and whenever the DOM changes
+      // (opening/closing the team panel changes content height)
+      window.addEventListener("load", postHeight);
+      window.addEventListener("resize", postHeight);
+
+      const obs = new MutationObserver(postHeight);
+      obs.observe(document.body, { childList: true, subtree: true, attributes: true });
+
+      // also poll briefly after load to catch the async chart render
+      let n = 0;
+      const t = setInterval(() => { postHeight(); if (++n > 20) clearInterval(t); }, 200);
+    })();
+  </script>
+  <script>
+    (function () {
+      const frame = document.querySelector(".explore-frame");
+      if (!frame) return;
+      window.addEventListener("message", (e) => {
+        if (e.data && e.data.type === "explore-height" && e.data.height) {
+          frame.style.height = e.data.height + "px";
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
