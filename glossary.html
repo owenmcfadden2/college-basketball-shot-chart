@@ -191,13 +191,10 @@
     <h2 class="gloss-section-title">Why these stats?</h2>
     <div class="gloss-card full-width">
       <p class="gloss-def">
-        Modern basketball analytics boils down to one insight: <strong>not all shots are created equal.</strong>
-        A layup at the rim and a pull-up two-pointer from the elbow both count as two points if made,
-        but the layup goes in far more often. A corner three is worth 50% more than a mid-range two,
-        yet often attempted by players who shoot it just as well. The analytics era taught coaches to
-        prioritize <em>rim attempts</em> and <em>three-pointers</em>&mdash;the two most efficient shot
-        types&mdash;over everything else. This project asks whether that wisdom actually predicts which
-        college teams win.
+        Modern basketball analytics boils down to one insight: not all shots are created equal. A layup at the rim and a pull-up two-pointer from the elbow both count as two points 
+        if made, but the layup goes in far more often. A corner three is worth 50% more than a mid-range two, yet it is often attempted by players who shoot it just as well. So 
+        essentially the same shot but a worse result regardless of whether it goes in. The analytics era taught coaches to prioritize rim attempts and three-pointers, the two most 
+        efficient shot types. This project asks whether this strategy actually translates to success seen on the court.
       </p>
     </div>
 
@@ -209,10 +206,8 @@
         <span class="gloss-abbr">eFG%</span>
         <h3 class="gloss-term">Effective Field Goal Percentage</h3>
         <p class="gloss-def">
-          A shooting efficiency stat that adjusts for the extra value of three-pointers.
-          A made three counts as 1.5 made field goals in the formula, so a team that
-          shoots 40% on threes grades out the same as one shooting 60% on twos.
-          <strong>Higher is better.</strong>
+          Shooting efficiency stat that adjusts for the extra value of three-pointers. A made three counts as 1.5 made field goals in the formula, so a team that shoots 40% on 
+          threes grades out the same as one shooting 60% on twos. Higher is better
         </p>
         <code class="gloss-formula">(FGM + 0.5 &times; 3PM) &divide; FGA</code>
       </div>
@@ -221,9 +216,7 @@
         <span class="gloss-abbr">FG%</span>
         <h3 class="gloss-term">Field Goal Percentage</h3>
         <p class="gloss-def">
-          The raw percentage of field goal attempts that a team makes, with no adjustment
-          for shot value. Used for individual zone efficiency (e.g., "what percentage of
-          rim attempts did they convert?"). <strong>Higher is better.</strong>
+          Raw percentage of field goal attempts that a team makes, with no adjustment for shot value. Used for individual zone efficiency
         </p>
         <code class="gloss-formula">FGM &divide; FGA</code>
       </div>
@@ -232,10 +225,8 @@
         <span class="gloss-abbr">FGA &amp; FGA/G</span>
         <h3 class="gloss-term">Field Goal Attempts (Per Game)</h3>
         <p class="gloss-def">
-          <em>FGA</em> is the raw count of shot attempts. <em>FGA/G</em> normalizes it
-          per game so teams with different game totals can be compared fairly.
-          In this project, FGA/G refers specifically to <em>rim + three-point</em>
-          attempts per game&mdash;the "volume" axis of the main chart.
+          Raw count of shot attempts. FGA/G normalizes it per game so teams with different game totals can be compared fairly. In this project, 
+          FGA/G refers specifically to rim + three-point attempts per game as the 'volume' axis of the main chart.
         </p>
       </div>
 
@@ -243,10 +234,8 @@
         <span class="gloss-abbr">FGA%</span>
         <h3 class="gloss-term">Shot Diet Share</h3>
         <p class="gloss-def">
-          The percentage of a team's total attempts that come from a specific zone.
-          For example, an <em>At-Rim FGA%</em> of 30% means nearly a third of the
-          team's shots are taken right at the basket. Used in the shot-diet breakdown
-          in each team's detail panel.
+          Percentage of a team's total attempts that come from a specific zone. For example, an At-Rim FGA% of 30% means nearly a third of the 
+          team's shots are taken right at the basket. Used in the shot-diet breakdown in each team's detail panel.
         </p>
       </div>
 
